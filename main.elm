@@ -3,6 +3,7 @@ import Debug
 import Element exposing (..)
 import Element.Attributes exposing (..)
 import Element.Events exposing (onClick)
+import Element.Input
 import Html exposing (Html)
 import Html.Attributes exposing (style)
 import Style
@@ -40,8 +41,9 @@ model = Array.fromList [Array.fromList [0,0,0,0,0,0]]
 
 -- UPDATE
 type Msg
-  = Add | Remove Int | Modify Int Int Int
-
+  = Add | Remove Int | Modify Int Int Int | Update Int Int Int
+update_ i j stringVal = 
+  Update i j (String.toInt stringVal |> Result.toMaybe |> Maybe.withDefault 0)
 
 update : Msg -> Model -> Model
 update msg model =
@@ -53,6 +55,13 @@ update msg model =
         oldArray = fromJust <| Array.get i model
         oldVal = fromJust <| Array.get j oldArray
         newArray = Array.set j (oldVal+add) oldArray
+      in
+        Array.set i newArray model
+    Update i j newVal ->
+      let
+        oldArray = fromJust <| Array.get i model
+        oldVal = fromJust <| Array.get j oldArray
+        newArray = Array.set j newVal oldArray
       in
         Array.set i newArray model
 
@@ -79,7 +88,7 @@ viewItem i item =
 
     showVal num val = row {} [spread] [
       button {} [onClick <| Modify i num -1] (text "-"),
-      text <| toString val,
+      Element.Input.text {} [] {label = Element.Input.hiddenLabel "", onChange = update_ i num, options = [], value = toString val},
       button {} [onClick <| Modify i num  1] (text "+")
     ]
   in
