@@ -1,7 +1,8 @@
 import Array exposing (Array)
-import Html exposing (Html, button)
-import Html.Events exposing (onClick)
 import Element exposing (..)
+import Element.Attributes exposing (..)
+import Element.Events exposing (onClick)
+import Html exposing (Html)
 import Style
 
 
@@ -26,12 +27,13 @@ type Msg
 update : Msg -> Model -> Model
 update msg model =
   case msg of
-    Add -> model
+    Add -> Array.push {rotate = (0,0,0), translate = (0,0,0)} model
 
 -- VIEW
-styleSheet = Style.styleSheet [ Style.style [] [] ]
+styleSheet = Style.styleSheet [ ]
 view : Model -> Html Msg
 view model =
   Element.layout styleSheet <|
-    column [] [] [ text "a", text "b" ]
+    row {} [padding 50, spacing 50]
+      ([ button {} [padding 20, onClick Add] (text "a") ] ++ Array.toList (Array.map (text << toString) model))
   
