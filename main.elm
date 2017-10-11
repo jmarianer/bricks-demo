@@ -1,6 +1,8 @@
 import Array exposing (Array)
-import Html exposing (Html, button, div, text)
+import Html exposing (Html, button)
 import Html.Events exposing (onClick)
+import Element exposing (..)
+import Style
 
 
 
@@ -18,26 +20,18 @@ model = Array.empty
 
 -- UPDATE
 type Msg
-  = Increment
-  | Decrement
-  | Reset
+  = Add
 
 
 update : Msg -> Model -> Model
 update msg model =
   case msg of
-    Increment -> model
-    Decrement -> model
-    Reset -> model
-
-
+    Add -> model
 
 -- VIEW
+styleSheet = Style.styleSheet [ Style.style [] [] ]
 view : Model -> Html Msg
 view model =
-  div []
-    [ button [ onClick Decrement ] [ text "-" ]
-    , div [] [ text (toString model) ]
-    , button [ onClick Increment ] [ text "+" ]
-    , button [ onClick Reset ] [ text "Reset" ]
-    ]
+  Element.layout styleSheet <|
+    column [] [] [ text "a", text "b" ]
+  
