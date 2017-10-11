@@ -71,13 +71,13 @@ view : Model -> Html Msg
 view model =
   let
     sheets : List (Html.Html msg)
-    sheets = List.map (\item -> Html.div [style [("transform", transform item), ("position", "absolute"), ("background-color", "red"), ("width", "50px"), ("height", "50px")]] []) <| Array.toList model
+    sheets = List.map (\item -> Html.div [style [("transform", transform item), ("position", "absolute"), ("background-color", "red"), ("width", "50px"), ("height", "50px")]] []) <| List.drop 1 <| Array.toList model
   in
     Element.layout styleSheet <|
       row {} [padding 50, spacing 50] ([
         button {} [padding 20, onClick Add] (text "+")
       ] ++ Array.toList (Array.indexedMap viewItem model) ++ [
-        html <| Html.div [style [("align-self", "center")]] sheets
+        html <| Html.div [style [("align-self", "center"), ("transform", transform (fromJust <| Array.get 0 model)), ("transform-style", "preserve-3d")]] sheets
       ])
 
 viewItem : Int -> Item -> Element {} variation Msg
@@ -89,6 +89,7 @@ viewItem i item =
     showVal num val = row {} [spread] [
       button {} [onClick <| Modify i num -1] (text "-"),
       Element.Input.text {} [] {label = Element.Input.hiddenLabel "", onChange = update_ i num, options = [], value = toString val},
+      text <| toString val,
       button {} [onClick <| Modify i num  1] (text "+")
     ]
   in
