@@ -4,6 +4,7 @@ import Element exposing (..)
 import Element.Attributes exposing (..)
 import Element.Events exposing (onClick)
 import Html exposing (Html)
+import Html.Attributes exposing (style)
 import Style
 
 
@@ -26,6 +27,9 @@ remove i a =
     Array.append a1 a2
 
 names = ["rotateX", "rotateY", "rotateZ", "translateX", "translateY", "translateZ"]
+
+transform : Item -> String
+transform item = String.concat <| List.map3 (\n i unit -> n ++ "(" ++ (toString i) ++ unit ++ ") ") names (Array.toList item) ["deg", "deg", "deg", "px", "px", "px"]
 
 -- MODEL
 type alias Model = Array Item
@@ -56,9 +60,16 @@ update msg model =
 styleSheet = Style.styleSheet [ ]
 view : Model -> Html Msg
 view model =
-  Element.layout styleSheet <|
-    row {} [padding 50, spacing 50]
-      ([ button {} [padding 20, onClick Add] (text "+") ] ++ Array.toList (Array.indexedMap viewItem model))
+  let
+    sheets : List (Html.Html msg)
+    sheets = List.map (\item -> Html.div [style [("transform", transform item), ("position", "absolute"), ("background-color", "red"), ("width", "50px"), ("height", "50px")]] []) <| Array.toList model
+  in
+    Element.layout styleSheet <|
+      row {} [padding 50, spacing 50] ([
+        button {} [padding 20, onClick Add] (text "+")
+      ] ++ Array.toList (Array.indexedMap viewItem model) ++ [
+        html <| Html.div [style [("align-self", "center")]] sheets
+      ])
 
 viewItem : Int -> Item -> Element {} variation Msg
 viewItem i item =
@@ -74,5 +85,7 @@ viewItem i item =
   in
     column {} [] (
       (List.concatMap (\(num, name, val) -> [text name, showVal num val]) numNameVal)
-      ++ [button {} [onClick <| Remove i] (text "-")])
+      ++ [
+        button {} [onClick <| Remove i] (text "-")
+      ])
     
