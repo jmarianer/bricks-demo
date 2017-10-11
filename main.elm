@@ -19,27 +19,26 @@ remove i a =
   in
     Array.append a1 a2
 
-
+names = ["rotateX", "rotateY", "rotateZ", "translateX", "translateY", "translateZ"]
 
 -- MODEL
-type alias Model = Array {
-  rotate: (Int, Int, Int),
-  translate: (Int, Int, Int)
-  }
+type alias Model = Array Item
+type alias Item = Array Int
 
 model : Model
-model = Array.empty
+model = Array.fromList [Array.fromList [0,0,0,0,0,0]]
 
 -- UPDATE
 type Msg
-  = Add | Remove Int
+  = Add | Remove Int | Modify Int Int Int
 
 
 update : Msg -> Model -> Model
 update msg model =
   case msg of
-    Add -> Array.push {rotate = (0,0,0), translate = (0,0,0)} model
+    Add -> Array.push (Array.fromList [0,0,0,0,0,0]) model
     Remove i -> remove i model
+    Modify i j add -> model
 
 -- VIEW
 styleSheet = Style.styleSheet [ ]
@@ -49,10 +48,9 @@ view model =
     row {} [padding 50, spacing 50]
       ([ button {} [padding 20, onClick Add] (text "+") ] ++ Array.toList (Array.indexedMap viewItem model))
 
-
+viewItem : Int -> Item -> Element {} variation Msg
 viewItem i item =
-  column {} []
-    [text <| toString item,
-     button {} [onClick <| Remove i] (text "-")
-    ]
+  column {} [] (
+    (List.concat <| List.map2 (\name val -> [text name, text <| toString val]) names <| Array.toList item)
+    ++ [button {} [onClick <| Remove i] (text "-")])
   
