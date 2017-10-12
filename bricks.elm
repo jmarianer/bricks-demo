@@ -16,22 +16,20 @@ update : Msg -> Model -> Model
 update msg model = model
 
 -- VIEW
-blockToBox : Model.Block -> List (Html msg)
+blockToBox : Model.Block -> List (String, String) -> List (Html msg)
 blockToBox { length, x, y, z, orientation } =
-  let
-    boundingBox = case orientation of
-      Model.X -> box x y z (x+length) (y+1) (z+1)
-      Model.Y -> box x y z (x+1) (y+length) (z+1)
-      Model.Z -> box x y z (x+1) (y+1) (z+length)
-  in
-    boundingBox [("background-color", "blue"), ("opacity", "0.5")]
+  case orientation of
+    Model.X -> box x y z (x+length) (y+1) (z+1)
+    Model.Y -> box x y z (x+1) (y+length) (z+1)
+    Model.Z -> box x y z (x+1) (y+1) (z+length)
 
 view : Model -> Html Msg
 view model =
   div [style [("display", "flex"), ("align-items", "center"), ("width", "100%"), ("height", "100%"), ("justify-content", "center")]] [
     div [style [("transform", "rotateX(76deg) rotateY(187deg) rotateZ(320deg)"), ("transform-style", "preserve-3d"), ("transform-origin", "bottom left"), ("box-sizing", "border-box")]] (
       box 0 0 0 model.width model.depth model.height []
-      ++ List.concatMap blockToBox model.blocks
+      ++ blockToBox model.mainBlock [("background-color", "red")]
+      ++ List.concatMap (\block -> blockToBox block [("background-color", "blue"), ("opacity", "0.5")]) model.blocks
   )]
 
 standardStyles = [("transform-origin", "top left"), ("border", "1px solid black"), ("position", "absolute"), ("box-sizing", "border-box")]

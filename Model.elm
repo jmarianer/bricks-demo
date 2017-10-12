@@ -4,6 +4,7 @@ type alias Model = {
   width: Int,
   depth: Int,
   height: Int,
+  mainBlock: Block,
   blocks: List Block
 }
 type Orientation = X|Y|Z
@@ -44,10 +45,11 @@ toModel s =
     boundary = fromJust <| List.head splits
     blocks = List.map toBlock <| fromJust <| List.tail splits
   in {
-      width  = definitelyInt <| String.slice 0 1 s,
-      depth  = definitelyInt <| String.slice 1 2 s,
-      height = definitelyInt <| String.slice 2 3 s,
-      blocks = blocks
+      width     = definitelyInt <| String.slice 0 1 s,
+      depth     = definitelyInt <| String.slice 1 2 s,
+      height    = definitelyInt <| String.slice 2 3 s,
+      mainBlock = fromJust <| List.head blocks,
+      blocks    = fromJust <| List.tail blocks
   }
 
 nodeProgram : a -> Program Never () ()
