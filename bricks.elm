@@ -53,12 +53,22 @@ mainDivStyle = style [
   ("align-items", "center"),
   ("width", "100%"),
   ("height", "100%"),
-  ("justify-content", "center")
+  ("justify-content", "space-around")
   ]
+
+secondaryDivStyle = style [
+  ("border", " 1px solid black"),
+  ("width", " 500px"),
+  ("height", " 500px"),
+  ("display", " flex"),
+  ("justify-content", " center"),
+  ("align-items", " center")
+  ]
+
 view : Model -> Html Msg
 view model =
   div [mainDivStyle] [
-    div [] [ShowBoard.toHtml <| Board.toBoard <| fromJust <| List.head model.steps],
+    div [secondaryDivStyle] [ShowBoard.toHtml <| Board.toBoard <| fromJust <| List.head model.steps],
     button [onClick Start] [text "Solve"],
     button [onClick Reset] [text "Reset"]
   ]

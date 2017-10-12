@@ -7,12 +7,6 @@ import Html.Attributes
 -- Hardcoded styles. TODO: Learn elm-css
 type alias StyleElement = (String, String)
 type alias Style = List StyleElement
-mainDivStyle : Style
-mainDivStyle = [
-  ("transform", "rotateX(76deg) rotateY(187deg) rotateZ(320deg)"),
-  ("transform-style", "preserve-3d"),
-  ("transform-origin", "bottom left"),
-  ("box-sizing", "border-box")]
 
 boxStyle : Style
 boxStyle = [
@@ -55,8 +49,15 @@ transform orientation x y z =
 toHtml : Board -> Html msg
 toHtml board =
   let
+    mainDivStyle = [
+      width board.width,
+      height board.depth,
+      ("transform", "rotateX(76deg) rotateY(187deg) rotateZ(320deg) translateZ(" ++ (toPixels <| (toFloat board.height)/2) ++ ")"),
+      ("transform-style", "preserve-3d"),
+      ("box-sizing", "border-box")]
     boundingBox = box 0 0 0 board.width board.depth board.height boxStyle
-    mainBlock = blockToBox board.mainBlock mainBlockStyle
+    mainBlock_ = board.mainBlock
+    mainBlock = blockToBox mainBlock_ mainBlockStyle
     otherBlocks = List.concatMap (\block -> blockToBox block otherBlockStyle) board.blocks
   in
     div [Html.Attributes.style mainDivStyle] (boundingBox ++ mainBlock ++ otherBlocks)
