@@ -1,19 +1,26 @@
 import Html exposing (..)
 import Html.Attributes exposing (style)
+import Html.Events exposing (onClick)
 import Model exposing (Model)
 
 main = Html.beginnerProgram { model = model, view = view, update = update }
 
 -- MODEL
-myTest = "334;2112Y;2010Y;2200Y;2101Z"
+myTest =  "334;2112Y;2010Y;2200Y;2101Z"
+myTest1 = "334;2112Y;2010Y;2200Y;2100Z"
+myTest2 = "334;2102Y;2010Y;2200Y;2100Z"
 
 model : Model
 model = Model.toModel myTest
 
 -- UPDATE
-type Msg = Int
+type alias Msg = Int
 update : Msg -> Model -> Model
-update msg model = model
+update msg model = case msg of
+  0 -> Model.toModel myTest
+  1 -> Model.toModel myTest1
+  2 -> Model.toModel myTest2
+  _ -> model
 
 -- VIEW
 blockToBox : Model.Block -> List (String, String) -> List (Html msg)
@@ -30,7 +37,11 @@ view model =
       box 0 0 0 model.width model.depth model.height []
       ++ blockToBox model.mainBlock [("background-color", "red")]
       ++ List.concatMap (\block -> blockToBox block [("background-color", "blue"), ("opacity", "0.5")]) model.blocks
-  )]
+    ),
+    button [onClick 0] [text "0"],
+    button [onClick 1] [text "1"],
+    button [onClick 2] [text "2"]
+  ]
 
 standardStyles = [("transform-origin", "top left"), ("border", "1px solid black"), ("position", "absolute"), ("box-sizing", "border-box")]
 
