@@ -1,13 +1,7 @@
-module Model exposing (..)
+module Model exposing (Model, Block, Orientation(..), toModel)
 
-type alias Model = {
-  width: Int,
-  depth: Int,
-  height: Int,
-  mainBlock: Block,
-  blocks: List Block
-}
-type Orientation = X|Y|Z
+type Orientation = X | Y | Z
+
 type alias Block = {
   length: Int,
   x: Int,
@@ -16,17 +10,32 @@ type alias Block = {
   orientation: Orientation
 }
 
+type alias Model = {
+  width: Int,
+  depth: Int,
+  height: Int,
+  mainBlock: Block,
+  blocks: List Block
+}
+
+
+-- toModel converts a string to a Model following a specific format. The
+-- function will crash if the string is improperly formatted.
+
+-- Utility functions to help with the crashing
 fromJust : Maybe a -> a
 fromJust x = case x of
     Just y -> y
     Nothing -> Debug.crash "error: fromJust Nothing"
 
 definitelyInt s = String.toInt s |> Result.toMaybe |> fromJust
+
 toOrientation s = case s of
   "X" -> X
   "Y" -> Y
   "Z" -> Z
-  _ -> Debug.crash <| "error: toOrientation " ++ s
+  _   -> Debug.crash <| "error: toOrientation " ++ s
+
 
 
 toModel : String -> Model
@@ -45,17 +54,9 @@ toModel s =
     boundary = fromJust <| List.head splits
     blocks = List.map toBlock <| fromJust <| List.tail splits
   in {
-      width     = definitelyInt <| String.slice 0 1 s,
-      depth     = definitelyInt <| String.slice 1 2 s,
-      height    = definitelyInt <| String.slice 2 3 s,
-      mainBlock = fromJust <| List.head blocks,
-      blocks    = fromJust <| List.tail blocks
+    width     = definitelyInt <| String.slice 0 1 s,
+    depth     = definitelyInt <| String.slice 1 2 s,
+    height    = definitelyInt <| String.slice 2 3 s,
+    mainBlock = fromJust <| List.head blocks,
+    blocks    = fromJust <| List.tail blocks
   }
-
-nodeProgram : a -> Program Never () ()
-nodeProgram _ =
-    Platform.program
-        { init = ( (), Cmd.none )
-        , update = \() -> \() -> ( (), Cmd.none )
-        , subscriptions = \() -> Sub.none
-        }

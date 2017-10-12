@@ -1,7 +1,7 @@
 import Html exposing (..)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
-import Model exposing (Model)
+import Model exposing (Model, Orientation(..))
 
 main = Html.beginnerProgram { model = model, view = view, update = update }
 
@@ -55,7 +55,6 @@ width x = ("width", toPixels x)
 height : Int -> Style
 height y = ("height", toPixels y)
 
-type Orientation = X|Y|Z
 transform : Orientation -> Int -> Int -> Int -> Style
 transform o x y z = 
   let
