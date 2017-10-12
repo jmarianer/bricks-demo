@@ -28,7 +28,6 @@ toOrientation s = case s of
   _ -> Debug.crash <| "error: toOrientation " ++ s
 
 
-myTest = "334;2112Y;2010Y;2200Y"
 toModel : String -> Model
 toModel s =
   let
@@ -58,8 +57,3 @@ nodeProgram _ =
         , update = \() -> \() -> ( (), Cmd.none )
         , subscriptions = \() -> Sub.none
         }
-
-
-main : Program Never () ()
-main =
-    nodeProgram (Debug.log "destiny" <| toModel myTest)
