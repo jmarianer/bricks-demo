@@ -1,4 +1,4 @@
-module Model exposing (Model, Block, Orientation(..), toModel)
+module Board exposing (Board, Block, Orientation(..), toBoard)
 
 type Orientation = X | Y | Z
 
@@ -10,7 +10,7 @@ type alias Block = {
   orientation: Orientation
 }
 
-type alias Model = {
+type alias Board = {
   width: Int,
   depth: Int,
   height: Int,
@@ -19,7 +19,7 @@ type alias Model = {
 }
 
 
--- toModel converts a string to a Model following a specific format. The
+-- toBoard converts a string to a Board following a specific format. The
 -- function will crash if the string is improperly formatted.
 
 -- Utility functions to help with the crashing
@@ -38,8 +38,8 @@ toOrientation s = case s of
 
 
 
-toModel : String -> Model
-toModel s =
+toBoard : String -> Board
+toBoard s =
   let
     toBlock : String -> Block
     toBlock s = {

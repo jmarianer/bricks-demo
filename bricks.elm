@@ -1,7 +1,7 @@
 import Html exposing (..)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
-import Model exposing (Model, Orientation(..))
+import Board exposing (Board, Orientation(..))
 
 main = Html.beginnerProgram { model = model, view = view, update = update }
 
@@ -10,27 +10,27 @@ myTest =  "334;2112Y;2010Y;2200Y;2101Z"
 myTest1 = "334;2112Y;2010Y;2200Y;2100Z"
 myTest2 = "334;2102Y;2010Y;2200Y;2100Z"
 
-model : Model
-model = Model.toModel myTest
+model : Board
+model = Board.toBoard myTest
 
 -- UPDATE
 type alias Msg = Int
-update : Msg -> Model -> Model
+update : Msg -> Board -> Board
 update msg model = case msg of
-  0 -> Model.toModel myTest
-  1 -> Model.toModel myTest1
-  2 -> Model.toModel myTest2
+  0 -> Board.toBoard myTest
+  1 -> Board.toBoard myTest1
+  2 -> Board.toBoard myTest2
   _ -> model
 
 -- VIEW
-blockToBox : Model.Block -> List (String, String) -> List (Html msg)
+blockToBox : Board.Block -> List (String, String) -> List (Html msg)
 blockToBox { length, x, y, z, orientation } =
   case orientation of
-    Model.X -> box x y z (x+length) (y+1) (z+1)
-    Model.Y -> box x y z (x+1) (y+length) (z+1)
-    Model.Z -> box x y z (x+1) (y+1) (z+length)
+    X -> box x y z (x+length) (y+1) (z+1)
+    Y -> box x y z (x+1) (y+length) (z+1)
+    Z -> box x y z (x+1) (y+1) (z+length)
 
-view : Model -> Html Msg
+view : Board -> Html Msg
 view model =
   div [style [("display", "flex"), ("align-items", "center"), ("width", "100%"), ("height", "100%"), ("justify-content", "center")]] [
     div [style [("transform", "rotateX(76deg) rotateY(187deg) rotateZ(320deg)"), ("transform-style", "preserve-3d"), ("transform-origin", "bottom left"), ("box-sizing", "border-box")]] (
