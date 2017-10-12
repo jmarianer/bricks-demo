@@ -43,7 +43,7 @@ view model =
     button [onClick 2] [text "2"]
   ]
 
-standardStyles = [("transform-origin", "top left"), ("border", "1px solid black"), ("position", "absolute"), ("box-sizing", "border-box")]
+standardStyles = [("transform-origin", "top left"), ("border", "1px solid black"), ("position", "absolute"), ("box-sizing", "border-box"), ("transition", "all ease-in-out .3s")]
 
 pixelsPerBlock = 50
 toPixels x = toString (pixelsPerBlock * x) ++ "px"
