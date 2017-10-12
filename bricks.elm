@@ -14,43 +14,65 @@ fromJust x = case x of
 
 
 -- Hardcoded steps to the solution
-myTest =  "334;2112Y;2010Y;2200Y;2101Z"
-myTest1 = "334;2112Y;2010Y;2200Y;2100Z"
-myTest2 = "334;2102Y;2010Y;2200Y;2100Z"
-
 steps = ["334;2112Y;2010Y;2200Y;2101Z",
          "334;2112Y;2010Y;2200Y;2100Z",
          "334;2102Y;2010Y;2200Y;2100Z"]
 
-main =
-  Html.program {
-    init = (Board.toBoard <| fromJust <| List.head steps, Cmd.none),
-    view = view,
-    update = update,
-    subscriptions = \_ -> Time.every second Tick
+
+-- MODEL
+type alias Model = {
+  steps : List String,
+  enabled : Bool
   }
 
+initialModel : Model
+initialModel = { steps = steps, enabled = False }
 
 -- UPDATE
-type Msg = Tick Time
-update : Msg -> Board -> (Board, Cmd Msg)
-update (Tick i) model =
+type Msg = Tick Time | Start | Reset
+update : Msg -> Model -> (Model, Cmd Msg)
+update msg model =
   let
-    newModel = case i of
-      0 -> Board.toBoard myTest
-      1 -> Board.toBoard myTest1
-      2 -> Board.toBoard myTest2
-      _ -> model
+    nextStep = case List.tail model.steps of
+      Just s  -> { model | steps = s }
+      Nothing -> model
+
+    newModel = case msg of
+      Start  -> { nextStep | enabled = True }
+      Tick _ -> nextStep
+      Reset  -> { model | steps = steps, enabled = False }
   in
     (newModel, Cmd.none)
 
 
 -- VIEW
-view : Board -> Html Msg
-view model =
-  div [style [("display", "flex"), ("align-items", "center"), ("width", "100%"), ("height", "100%"), ("justify-content", "center")]] [
-    ShowBoard.toHtml model,
-    button [onClick <| Tick 0] [text "0"],
-    button [onClick <| Tick 1] [text "1"],
-    button [onClick <| Tick 2] [text "2"]
+-- TODO either learn elm-css or use style-elements
+mainDivStyle = style [
+  ("display", "flex"),
+  ("flex-direction", "column"),
+  ("align-items", "center"),
+  ("width", "100%"),
+  ("height", "100%"),
+  ("justify-content", "center")
   ]
+view : Model -> Html Msg
+view model =
+  div [mainDivStyle] [
+    div [] [ShowBoard.toHtml <| Board.toBoard <| fromJust <| List.head model.steps],
+    button [onClick Start] [text "Solve"],
+    button [onClick Reset] [text "Reset"]
+  ]
+
+
+-- MAIN
+subscriptions : Model -> Sub Msg
+subscriptions {enabled} =
+  if enabled then Time.every second Tick else Sub.none
+
+main =
+  Html.program {
+    init = (initialModel, Cmd.none),
+    view = view,
+    update = update,
+    subscriptions = subscriptions
+  }
