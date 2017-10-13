@@ -4,6 +4,7 @@ type Orientation = X | Y | Z
 
 type alias Block = {
   length: Int,
+  -- TODO: Consider a tuple of ints instead.
   x: Int,
   y: Int,
   z: Int,
@@ -11,6 +12,7 @@ type alias Block = {
 }
 
 type alias Board = {
+  -- TODO: Consider renaming to maxX, maxY, maxZ or a tuple of ints.
   width: Int,
   depth: Int,
   height: Int,
