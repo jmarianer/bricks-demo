@@ -1,4 +1,4 @@
-module Board exposing (Board, Block, Orientation(..), toBoard)
+module Board exposing (Board, Block, Orientation(..), toBoard, serializeBoard)
 
 type Orientation = X | Y | Z
 
@@ -60,3 +60,15 @@ toBoard s =
     mainBlock = fromJust <| List.head blocks,
     blocks    = fromJust <| List.tail blocks
   }
+
+
+serializeBoard : Board -> String
+serializeBoard b =
+  let
+    convertBlock : Block -> String
+    convertBlock b = String.concat [toString b.length, toString b.x, toString b.y, toString b.z, toString b.orientation]
+
+    init = String.concat [toString b.width, toString b.depth, toString b.height]
+    convertedBlocks = List.map convertBlock (b.mainBlock :: b.blocks)
+  in
+    String.join ";" (init :: convertedBlocks)
