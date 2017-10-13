@@ -1,10 +1,9 @@
-module SolveBoard exposing (..) --(solveBoard)
+module SolveBoard exposing (solveBoard)
 
 import Array exposing (Array)
 import Board exposing (Board, Block, Orientation(..), toBoard, serializeBoard)
+import Dict exposing (Dict)
 import Set exposing (Set)
-
-testBoard = toBoard "334;2112Y;2010Y;2200Y;2101Z"
 
 -- TODO: Better type names for Coords and Set Coords
 type alias Coords = (Int, Int, Int)
@@ -101,4 +100,66 @@ nextMoves board =
   in
     List.map (\blockArray -> blocksToBoard <| Array.toList blockArray) tryToMoveAllBlocks
 
---solveBoard : Board -> List Board
+winner : Board -> Bool
+winner board =
+  board.mainBlock.x == 0 || board.mainBlock.y == 0 || board.mainBlock.z == 0
+  
+type alias SolverState = {
+  queue : List String,
+  previousPosition : Dict String String,
+  visited : Set String
+  }
+
+iterate : SolverState -> (Bool, SolverState)
+iterate state =
+  let
+    newState currentPosition restOfQueue =
+      let
+        nextBoards = List.map serializeBoard <| nextMoves <| toBoard currentPosition
+        newBoards = Set.diff (Set.fromList nextBoards) state.visited
+        newPrevs = List.map (\x -> (x, currentPosition)) <| Set.toList newBoards
+      in
+        { state | queue = restOfQueue ++ Set.toList (newBoards),
+                  previousPosition = Dict.union state.previousPosition <| Dict.fromList newPrevs,
+                  visited = Set.union state.visited newBoards
+        }
+  in
+    case state.queue of
+      [] -> (True, state)
+      x::xs ->
+        if (winner <| toBoard x)
+        then (True, state)
+        else (False, newState x xs)
+
+iterateUntilDone : SolverState -> SolverState
+iterateUntilDone state =
+  let
+    nextIteration = iterate state
+  in
+    case nextIteration of
+      (True,  nextState) -> nextState
+      (False, nextState) -> iterateUntilDone nextState
+
+extractPath : String -> SolverState -> List String
+extractPath destination state =
+  case Dict.get destination state.previousPosition of
+    Nothing -> [destination]
+    Just x  -> destination :: extractPath x state
+
+extractDefaultPath : SolverState -> List String
+extractDefaultPath state =
+  case state.queue of
+    [] -> []
+    x::xs -> extractPath x state
+
+solveBoard : Board -> List Board
+solveBoard board =
+  let
+    initialState = {
+      queue = [serializeBoard board],
+      previousPosition = Dict.empty,
+      visited = Set.singleton <| serializeBoard board
+    }
+    finalState = iterateUntilDone initialState
+  in
+    List.map toBoard <| List.reverse <| extractDefaultPath finalState

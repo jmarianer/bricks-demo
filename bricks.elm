@@ -5,7 +5,7 @@ import Html.Events exposing (onClick)
 import Board exposing (Board, Orientation(..))
 import Time exposing (Time, second)
 import ShowBoard
-import SolveBoard exposing (..)
+import SolveBoard
 
 -- Utilities
 fromJust : Maybe a -> a
@@ -13,12 +13,10 @@ fromJust x = case x of
     Just y -> y
     Nothing -> Debug.crash "error: fromJust Nothing"
 
+-- Steps to the solution
+testBoard = Board.toBoard "334;2112Y;2010Y;2200Y;2101Z"
 
--- Hardcoded steps to the solution
-steps = List.map Board.toBoard
-        ["334;2112Y;2010Y;2200Y;2101Z",
-         "334;2112Y;2010Y;2200Y;2100Z",
-         "334;2102Y;2010Y;2200Y;2100Z"]
+steps = SolveBoard.solveBoard testBoard
 
 -- MODEL
 type alias Model = {
