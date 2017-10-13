@@ -5,12 +5,35 @@ import Set exposing (Set)
 
 testBoard = toBoard "334;2112Y;2010Y;2200Y;2101Z"
 
-spaces : Block -> Set (Int, Int, Int)
+type alias Coords = (Int, Int, Int)
+
+coordinates : Block -> Coords
+coordinates { x, y, z } = (x, y, z)
+
+getCoord : Coords -> Orientation -> Int
+getCoord (x, y, z) orientation =
+  case orientation of
+    X -> x
+    Y -> y
+    Z -> z
+
+withCoord : Coords -> Orientation -> Int -> Coords
+withCoord (x, y, z) orientation newCoord =
+  case orientation of
+    X -> (newCoord, y, z)
+    Y -> (x, newCoord, z)
+    Z -> (x, y, newCoord)
+
+spaces : Block -> Set Coords
 spaces block =
-  case block.orientation of
-    X -> Set.fromList <| List.map (\x -> (x, block.y, block.z)) <| List.range block.x (block.x + block.length - 1)
-    Y -> Set.fromList <| List.map (\y -> (block.x, y, block.z)) <| List.range block.y (block.y + block.length - 1)
-    Z -> Set.fromList <| List.map (\z -> (block.x, block.y, z)) <| List.range block.z (block.z + block.length - 1)
+  let
+    coords = coordinates block
+    start = getCoord coords block.orientation
+    end = start + block.length - 1
+  in
+    Set.fromList <| List.map (\x -> withCoord coords block.orientation x) <| List.range start end
+
+
 
 allSpaces : Board -> Set (Int, Int, Int)
 allSpaces board = List.foldl Set.union (spaces board.mainBlock) (List.map spaces board.blocks)
