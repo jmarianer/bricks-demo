@@ -5,6 +5,7 @@ import Html.Events exposing (onClick)
 import Board exposing (Board, Orientation(..))
 import Time exposing (Time, second)
 import ShowBoard
+import SolveBoard exposing (..)
 
 -- Utilities
 fromJust : Maybe a -> a
@@ -14,14 +15,14 @@ fromJust x = case x of
 
 
 -- Hardcoded steps to the solution
-steps = ["334;2112Y;2010Y;2200Y;2101Z",
+steps = List.map Board.toBoard
+        ["334;2112Y;2010Y;2200Y;2101Z",
          "334;2112Y;2010Y;2200Y;2100Z",
          "334;2102Y;2010Y;2200Y;2100Z"]
 
-
 -- MODEL
 type alias Model = {
-  steps : List String,
+  steps : List Board,
   enabled : Bool
   }
 
@@ -69,7 +70,7 @@ secondaryDivStyle = style [
 view : Model -> Html Msg
 view model =
   div [mainDivStyle] [
-    div [secondaryDivStyle] [ShowBoard.toHtml <| Board.toBoard <| fromJust <| List.head model.steps],
+    div [secondaryDivStyle] [ShowBoard.toHtml <| fromJust <| List.head model.steps],
     button [onClick Start] [text "Solve"],
     button [onClick Reset] [text "Reset"]
   ]
