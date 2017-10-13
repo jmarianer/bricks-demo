@@ -4,7 +4,7 @@ import Array exposing (Array)
 import Board exposing (Board, Block, Orientation(..), toBoard, serializeBoard)
 import Set exposing (Set)
 
-testBoard = toBoard "334;2112Y;2010Y"--;2200Y;2101Z"
+testBoard = toBoard "334;2112Y;2010Y;2200Y;2101Z"
 
 -- TODO: Better type names for Coords and Set Coords
 type alias Coords = (Int, Int, Int)
@@ -80,7 +80,7 @@ fromJust x = case x of
     Just y -> y
     Nothing -> Debug.crash "error: fromJust Nothing"
 
---nextMoves : Board -> List Board
+nextMoves : Board -> List Board
 nextMoves board =
   let
     blocks : Array Block
@@ -90,9 +90,15 @@ nextMoves board =
     tryToMoveBlock i =
       List.map (\block -> Array.set i block blocks) <| move board (fromJust <| Array.get i blocks)
 
-    movedBlocks =
-      Array.map (\x -> x) blocks
+    tryToMoveAllBlocks : List (Array Block)
+    tryToMoveAllBlocks = List.concatMap tryToMoveBlock <| List.range 0 <| Array.length blocks - 1
+
+    blocksToBoard : List Block -> Board
+    blocksToBoard blocks =
+      { board | mainBlock = fromJust <| List.head blocks,
+                blocks    = fromJust <| List.tail blocks }
+
   in
-    tryToMoveBlock 0
+    List.map (\blockArray -> blocksToBoard <| Array.toList blockArray) tryToMoveAllBlocks
 
 --solveBoard : Board -> List Board
