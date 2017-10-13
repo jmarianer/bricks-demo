@@ -62,7 +62,8 @@ secondaryDivStyle = style [
   ("height", " 500px"),
   ("display", " flex"),
   ("justify-content", " center"),
-  ("align-items", " center")
+  ("align-items", " center"),
+  ("overflow", "none")
   ]
 
 view : Model -> Html Msg

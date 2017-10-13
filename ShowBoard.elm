@@ -56,8 +56,24 @@ toHtml board =
       ("transform-style", "preserve-3d"),
       ("box-sizing", "border-box")]
     boundingBox = box 0 0 0 board.width board.depth board.height boxStyle
-    mainBlock_ = board.mainBlock
-    mainBlock = blockToBox mainBlock_ mainBlockStyle
+
+    boardMainBlock = board.mainBlock
+    winPosition = -boardMainBlock.length
+    mungeMainBlock : (Bool, Block)
+    mungeMainBlock =
+      if boardMainBlock.x == 0
+      then (True, { boardMainBlock | x = winPosition })
+      else if boardMainBlock.y == 0
+      then (True, { boardMainBlock | y = winPosition })
+      else if boardMainBlock.z == 0
+      then (True, { boardMainBlock | z = winPosition })
+      else (False, boardMainBlock)
+    winner = Tuple.first mungeMainBlock
+
+    mainBlockStyle_ = if winner
+      then mainBlockStyle ++ [("opacity", "0")]
+      else mainBlockStyle
+    mainBlock = blockToBox (Tuple.second mungeMainBlock) mainBlockStyle_
     otherBlocks = List.concatMap (\block -> blockToBox block otherBlockStyle) board.blocks
   in
     div [Html.Attributes.style mainDivStyle] (boundingBox ++ mainBlock ++ otherBlocks)
