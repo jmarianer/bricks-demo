@@ -22,6 +22,8 @@ mainBlockStyle = boxStyle ++ [("background-color", "red")]
 otherBlockStyle : Style
 otherBlockStyle = boxStyle ++ [("background-color", "blue"), ("opacity", "0.5")]
 
+windowOutStyle : Style
+windowOutStyle = (boxStyle ++ [("border", "2px solid black")])
 
 -- Styling utilities
 pixelsPerBlock = 50
@@ -55,7 +57,6 @@ toHtml board =
       ("transform", "rotateX(76deg) rotateY(187deg) rotateZ(320deg) translateZ(" ++ (toPixels <| (toFloat board.height)/2) ++ ")"),
       ("transform-style", "preserve-3d"),
       ("box-sizing", "border-box")]
-    boundingBox = box 0 0 0 board.width board.depth board.height boxStyle
 
     boardMainBlock = board.mainBlock
     winPosition = -boardMainBlock.length
@@ -69,14 +70,21 @@ toHtml board =
       then (True, { boardMainBlock | z = winPosition })
       else (False, boardMainBlock)
     winner = Tuple.first mungeMainBlock
-
     mainBlockStyle_ = if winner
       then mainBlockStyle ++ [("opacity", "0")]
       else mainBlockStyle
+
+    windowOut_ = case boardMainBlock.orientation of
+      X -> pane 1 1 X boardMainBlock.y boardMainBlock.z 0
+      Y -> pane 1 1 Y boardMainBlock.z boardMainBlock.x 0
+      Z -> pane 1 1 Z boardMainBlock.y boardMainBlock.x 0
+    windowOut = [windowOut_ windowOutStyle]
+
+    boundingBox = box 0 0 0 board.width board.depth board.height boxStyle
     mainBlock = blockToBox (Tuple.second mungeMainBlock) mainBlockStyle_
     otherBlocks = List.concatMap (\block -> blockToBox block otherBlockStyle) board.blocks
   in
-    div [Html.Attributes.style mainDivStyle] (boundingBox ++ mainBlock ++ otherBlocks)
+    div [Html.Attributes.style mainDivStyle] (boundingBox ++ mainBlock ++ otherBlocks ++ windowOut)
   
 blockToBox : Block -> Style -> List (Html msg)
 blockToBox { length, x, y, z, orientation } =
@@ -87,10 +95,14 @@ blockToBox { length, x, y, z, orientation } =
 
 box : Int -> Int -> Int -> Int -> Int -> Int -> Style -> List (Html msg)
 box x1 y1 z1 x2 y2 z2 style = [
-    div [Html.Attributes.style ([width (y2 - y1), height (x2 - x1), transform Z y1 x1 z1] ++ style)] [],
-    div [Html.Attributes.style ([width (y2 - y1), height (x2 - x1), transform Z y1 x1 z2] ++ style)] [],
-    div [Html.Attributes.style ([width (z2 - z1), height (x2 - x1), transform Y z1 x1 y1] ++ style)] [],
-    div [Html.Attributes.style ([width (z2 - z1), height (x2 - x1), transform Y z1 x1 y2] ++ style)] [],
-    div [Html.Attributes.style ([width (y2 - y1), height (z2 - z1), transform X y1 z1 x1] ++ style)] [],
-    div [Html.Attributes.style ([width (y2 - y1), height (z2 - z1), transform X y1 z1 x2] ++ style)] []
+    pane (y2 - y1) (x2 - x1) Z y1 x1 z1 style,
+    pane (y2 - y1) (x2 - x1) Z y1 x1 z2 style,
+    pane (z2 - z1) (x2 - x1) Y z1 x1 y1 style,
+    pane (z2 - z1) (x2 - x1) Y z1 x1 y2 style,
+    pane (y2 - y1) (z2 - z1) X y1 z1 x1 style,
+    pane (y2 - y1) (z2 - z1) X y1 z1 x2 style
   ]
+
+pane w h orientation x y z style =
+  div [Html.Attributes.style ([width w, height h, transform orientation x y z] ++ style)] []
+
