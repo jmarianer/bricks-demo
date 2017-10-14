@@ -1,45 +1,36 @@
 import Board exposing (Board, Orientation(..))
 import Html exposing (..)
-import Html.Attributes exposing (style)
-import Html.Events exposing (onClick)
+import Html.Attributes exposing (style, type_)
+import Html.Events exposing (onClick, onInput)
 import Board exposing (Board, Orientation(..))
 import Time exposing (Time, second)
 import ShowBoard
 import SolveBoard
 
--- Utilities
-fromJust : Maybe a -> a
-fromJust x = case x of
-    Just y -> y
-    Nothing -> Debug.crash "error: fromJust Nothing"
-
--- Steps to the solution
-testBoard = Board.toBoard "334;2112Y;2010Y;2200Y;2101Z"
-
-steps = SolveBoard.solveBoard testBoard
-
 -- MODEL
 type alias Model = {
+  input : String,
   steps : List Board,
   enabled : Bool
   }
 
 initialModel : Model
-initialModel = { steps = steps, enabled = False }
+initialModel = { input = "", steps = [], enabled = False }
 
 -- UPDATE
-type Msg = Tick Time | Start | Reset
+type Msg = Tick Time | Start | Show | Input String
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   let
     nextStep = case List.tail model.steps of
       Just s  -> { model | steps = s }
-      Nothing -> model
+      Nothing -> { model | enabled = False }
 
     newModel = case msg of
-      Start  -> { nextStep | enabled = True }
-      Tick _ -> nextStep
-      Reset  -> { model | steps = steps, enabled = False }
+      Start   -> { model | steps = SolveBoard.solveBoard <| Board.toBoard model.input, enabled = True }
+      Tick _  -> nextStep
+      Show    -> { model | steps = [board.toBoard model.input], enabled = False }
+      Input s -> { model | input = s }
   in
     (newModel, Cmd.none)
 
@@ -67,11 +58,17 @@ secondaryDivStyle = style [
 
 view : Model -> Html Msg
 view model =
-  div [mainDivStyle] [
-    div [secondaryDivStyle] [ShowBoard.toHtml <| fromJust <| List.head model.steps],
-    button [onClick Start] [text "Solve"],
-    button [onClick Reset] [text "Reset"]
-  ]
+  let
+    maybeShowBoard =
+      case List.head model.steps of
+        Nothing -> []
+        Just x  -> [ShowBoard.toHtml x]
+  in
+    div [mainDivStyle] [
+      div [secondaryDivStyle] maybeShowBoard,
+      input [ type_ "text", onInput Input ] [],
+      button [onClick Start] [text "Solve"]
+    ]
 
 
 -- MAIN
