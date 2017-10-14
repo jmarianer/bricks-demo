@@ -118,6 +118,8 @@ iterate state =
         nextBoards = List.map serializeBoard <| nextMoves <| toBoard currentPosition
         newBoards = Set.diff (Set.fromList nextBoards) state.visited
         newPrevs = List.map (\x -> (x, currentPosition)) <| Set.toList newBoards
+
+        _ = Debug.log currentPosition ""
       in
         { state | queue = restOfQueue ++ Set.toList (newBoards),
                   previousPosition = Dict.union state.previousPosition <| Dict.fromList newPrevs,

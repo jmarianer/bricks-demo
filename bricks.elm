@@ -23,13 +23,14 @@ update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   let
     nextStep = case List.tail model.steps of
+      Just [] -> { model | enabled = False }
       Just s  -> { model | steps = s }
       Nothing -> { model | enabled = False }
 
     newModel = case msg of
       Start   -> { model | steps = SolveBoard.solveBoard <| Board.toBoard model.input, enabled = True }
       Tick _  -> nextStep
-      Show    -> { model | steps = [board.toBoard model.input], enabled = False }
+      Show    -> { model | steps = [Board.toBoard model.input], enabled = False }
       Input s -> { model | input = s }
   in
     (newModel, Cmd.none)
@@ -67,6 +68,7 @@ view model =
     div [mainDivStyle] [
       div [secondaryDivStyle] maybeShowBoard,
       input [ type_ "text", onInput Input ] [],
+      button [onClick Show] [text "Show"],
       button [onClick Start] [text "Solve"]
     ]
 
