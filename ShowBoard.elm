@@ -1,31 +1,37 @@
 module ShowBoard exposing (toHtml)
 
 import Board exposing (Board, Block, Orientation(..))
+import Css exposing (asPairs)
 import Html exposing (Html, div)
 import Html.Attributes
 import Html.CssHelpers
 import Stylesheet exposing (..)
 
--- Styling utilities. TODO: Use elm-css here
+-- Styling utilities.
+style = Css.asPairs >> Html.Attributes.style
+
 pixelsPerBlock = 50
-toPixels x = toString (pixelsPerBlock * x) ++ "px"
+toPixels x = Css.px <| toFloat <| pixelsPerBlock * x
+toPixels_ x = toString (pixelsPerBlock * x) ++ "px" -- TODO remove
 
---width : Int -> StyleElement
-width x = ("width", toPixels x)
+width : Int -> Css.Style
+width = Css.width << toPixels
 
---height : Int -> StyleElement
-height y = ("height", toPixels y)
+height : Int -> Css.Style
+height = Css.height << toPixels
 
-transform : Orientation -> Int -> Int -> Int -> (String, String)
+transform : Orientation -> Int -> Int -> Int -> Css.Style
 transform orientation x y z = 
   let
-    translate x y z = "translate3d(" ++ (String.join "," <| List.map toPixels <| [x, y, z]) ++ ")"
-    transform = case orientation of
-      X -> "rotateX(-90deg)" ++ translate x y z
-      Y -> "rotateY(90deg)" ++ translate x y z
-      Z -> translate x y -z
+    translate x y z =
+      Css.translate3d (toPixels x) (toPixels y) (toPixels z)
+
+    transformList = case orientation of
+      X -> [Css.rotateX (Css.deg -90), translate x y z]
+      Y -> [Css.rotateY (Css.deg  90), translate x y z]
+      Z -> [translate x y -z]
   in
-    ("transform", transform)
+    Css.transforms transformList
 
 
 -- Functions
@@ -36,9 +42,9 @@ toHtml board =
   let
     -- TODO: elm-css
     mainDivStyle = [
-      width board.width,
-      height board.depth,
-      ("transform", "rotateX(76deg) rotateY(187deg) rotateZ(320deg) translateZ(" ++ (toPixels <| (toFloat board.height)/2) ++ ")"),
+      ("width", toPixels_ board.width),
+      ("height", toPixels_ board.depth),
+      ("transform", "rotateX(76deg) rotateY(187deg) rotateZ(320deg) translateZ(" ++ (toPixels_ <| (toFloat board.height)/2) ++ ")"),
       ("transform-style", "preserve-3d"),
       ("box-sizing", "border-box")]
 
@@ -88,5 +94,5 @@ box x1 y1 z1 x2 y2 z2 classList = [
   ]
 
 pane w h orientation x y z classList =
-  div [Html.Attributes.style [width w, height h, transform orientation x y z], classes classList] []
+  div [style [width w, height h, transform orientation x y z], classes classList] []
 
