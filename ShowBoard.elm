@@ -16,10 +16,10 @@ width x = ("width", toPixels x)
 --height : Int -> StyleElement
 height y = ("height", toPixels y)
 
---transform : Orientation -> Int -> Int -> Int -> StyleElement
+transform : Orientation -> Int -> Int -> Int -> (String, String)
 transform orientation x y z = 
   let
-    translate x y z = String.concat <| List.concat <| List.map2 (\d x -> ["translate", d, "(", toPixels x, ")"]) ["X", "Y", "Z"] [x, y, z]
+    translate x y z = "translate3d(" ++ (String.join "," <| List.map toPixels <| [x, y, z]) ++ ")"
     transform = case orientation of
       X -> "rotateX(-90deg)" ++ translate x y z
       Y -> "rotateY(90deg)" ++ translate x y z
