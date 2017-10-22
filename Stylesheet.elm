@@ -7,7 +7,8 @@ type CssClass = Rotatable | MainBlock | OtherBlock | WindowOut | Invisible | Bou
 css =
   stylesheet [
     everything [
-      boxSizing borderBox
+      boxSizing borderBox,
+      Css.transformStyle Css.preserve3d
     ],
     class Rotatable [
       property "transform-origin" "top left",

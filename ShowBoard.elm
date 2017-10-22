@@ -1,18 +1,17 @@
 module ShowBoard exposing (toHtml)
 
 import Board exposing (Board, Block, Orientation(..))
-import Css exposing (asPairs)
+import Css exposing (asPairs, deg, px)
 import Html exposing (Html, div)
 import Html.Attributes
 import Html.CssHelpers
 import Stylesheet exposing (..)
 
--- Styling utilities.
+-- Styling utilities
 style = Css.asPairs >> Html.Attributes.style
 
 pixelsPerBlock = 50
-toPixels x = Css.px <| toFloat <| pixelsPerBlock * x
-toPixels_ x = toString (pixelsPerBlock * x) ++ "px" -- TODO remove
+toPixels x = px <| toFloat <| pixelsPerBlock * x
 
 width : Int -> Css.Style
 width = Css.width << toPixels
@@ -33,20 +32,17 @@ transform orientation x y z =
   in
     Css.transforms transformList
 
-
--- Functions
 classes = .class <| Html.CssHelpers.withNamespace ""
 
+
+-- Main
 toHtml : Board -> Html msg
 toHtml board =
   let
-    -- TODO: elm-css
     mainDivStyle = [
-      ("width", toPixels_ board.width),
-      ("height", toPixels_ board.depth),
-      ("transform", "rotateX(76deg) rotateY(187deg) rotateZ(320deg) translateZ(" ++ (toPixels_ <| (toFloat board.height)/2) ++ ")"),
-      ("transform-style", "preserve-3d"),
-      ("box-sizing", "border-box")]
+      width board.width,
+      height board.depth,
+      Css.transforms [Css.rotateX (deg 76), Css.rotateY (deg 187), Css.rotateZ (deg 320), Css.translateZ (toPixels (board.height // 2))]]
 
     boardMainBlock = board.mainBlock
     winPosition = -boardMainBlock.length
@@ -74,7 +70,7 @@ toHtml board =
     mainBlock = blockToBox (Tuple.second mungeMainBlock) mainBlockClasses
     otherBlocks = List.concatMap (\block -> blockToBox block [Rotatable, OtherBlock]) board.blocks
   in
-    div [Html.Attributes.style mainDivStyle] (boundingBox ++ mainBlock ++ otherBlocks ++ windowOut)
+    div [style mainDivStyle] (boundingBox ++ mainBlock ++ otherBlocks ++ windowOut)
   
 blockToBox : Block -> List CssClass -> List (Html msg)
 blockToBox { length, x, y, z, orientation } =
