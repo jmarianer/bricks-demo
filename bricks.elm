@@ -6,6 +6,7 @@ import Board exposing (Board, Orientation(..))
 import Time exposing (Time, second)
 import ShowBoard
 import SolveBoard
+import Stylesheet exposing (cssString)
 
 -- MODEL
 type alias Model = {
@@ -66,6 +67,7 @@ view model =
         Just x  -> [ShowBoard.toHtml x]
   in
     div [mainDivStyle] [
+      node "style" [] [text cssString],
       div [secondaryDivStyle] maybeShowBoard,
       input [ type_ "text", onInput Input ] [],
       button [onClick Show] [text "Show"],
