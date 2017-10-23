@@ -15,8 +15,9 @@ type alias Model = {
   enabled : Bool
   }
 
+default = "334;2112Y;2010Y;2200Y;2102Z"
 initialModel : Model
-initialModel = { input = "", steps = [], enabled = False }
+initialModel = { input = default, steps = [Board.toBoard default], enabled = False }
 
 -- UPDATE
 type Msg = Tick Time | Start | Show | Input String

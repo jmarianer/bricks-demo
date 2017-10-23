@@ -3,9 +3,16 @@ module Stylesheet exposing (CssClass(..), cssString)
 import Css exposing (..)
 import Css.Elements exposing (img, body, div, h1)
 
-type CssClass = Rotatable | MainBlock | OtherBlock | WindowOut | Invisible | BoundingBox
+type CssClass = Rotatable | MainBlock | OtherBlock | WindowOut | Invisible | BoundingBox | BackPane
+border = border3 (px 1) solid (hex "000")
+mainBlockColor = hex "C00"
+otherBlockColor = hex "1685CC"
+
 css =
   stylesheet [
+    body [
+      backgroundColor (hex "85B4FF")
+    ],
     everything [
       boxSizing borderBox,
       Css.transformStyle Css.preserve3d
@@ -16,15 +23,18 @@ css =
       property "transition" "all ease-in-out .3s"
     ],
     class BoundingBox [
-      border3 (px 1) solid (hex "000")
+      border
     ],
     class MainBlock [
-      border3 (px 1) solid (hex "000"),
-      backgroundColor (hex "F00")
+      border,
+      backgroundColor mainBlockColor
     ],
     class OtherBlock [
-      border3 (px 1) solid (hex "000"),
-      backgroundColor (hex "00F")
+      border,
+      backgroundColor otherBlockColor
+    ],
+    class BackPane [
+      backgroundColor (hex "FFF")
     ],
     class WindowOut [
       border3 (px 2) solid (hex "000")

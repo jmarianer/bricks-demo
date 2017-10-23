@@ -42,7 +42,7 @@ toHtml board =
     mainDivStyle = [
       width board.width,
       height board.depth,
-      Css.transforms [Css.rotateX (deg 76), Css.rotateY (deg 187), Css.rotateZ (deg 320), Css.translateZ (toPixels (board.height // 2))]]
+      Css.transforms [Css.translateZ (px 200), Css.rotateX (deg 76), Css.rotateY (deg 187), Css.rotateZ (deg 320), Css.translateZ (toPixels (board.height // 2))]]
 
     boardMainBlock = board.mainBlock
     winPosition = -boardMainBlock.length
@@ -81,11 +81,11 @@ blockToBox { length, x, y, z, orientation } =
 
 box : Int -> Int -> Int -> Int -> Int -> Int -> List CssClass -> List (Html msg)
 box x1 y1 z1 x2 y2 z2 classList = [
-    pane (y2 - y1) (x2 - x1) Z y1 x1 z1 classList,
+    pane (y2 - y1) (x2 - x1) Z y1 x1 z1 (BackPane::classList),
     pane (y2 - y1) (x2 - x1) Z y1 x1 z2 classList,
     pane (z2 - z1) (x2 - x1) Y z1 x1 y1 classList,
-    pane (z2 - z1) (x2 - x1) Y z1 x1 y2 classList,
-    pane (y2 - y1) (z2 - z1) X y1 z1 x1 classList,
+    pane (z2 - z1) (x2 - x1) Y z1 x1 y2 (BackPane::classList),
+    pane (y2 - y1) (z2 - z1) X y1 z1 x1 (BackPane::classList),
     pane (y2 - y1) (z2 - z1) X y1 z1 x2 classList
   ]
 
