@@ -119,7 +119,7 @@ view model =
       [Html.node "style" [] [Html.text cssString], ShowBoard.toHtml model.current]
 
     -- TODO: Rename
-    makeColumn style (i,block) = column style [padding 5, spacing 10] [
+    makeColumn style (i,block) = column style [paddingXY 10 12, spacing 10] [
       row None [] [text "X: ", numberInput (Block i <| Orientation X) block.x],
       row None [] [text "Y: ", numberInput (Block i <| Orientation Y) block.y],
       row None [] [text "Z: ", numberInput (Block i <| Orientation Z) block.z],
