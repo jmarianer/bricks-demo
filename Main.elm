@@ -1,5 +1,5 @@
-import Array
-import Board exposing (Board, Orientation(..))
+import Array exposing (Array)
+import Board exposing (Board, Block, Orientation(..))
 import Color exposing (rgb)
 import Element exposing (..)
 import Element.Attributes exposing (..)
@@ -29,21 +29,47 @@ initialModel : Model
 initialModel = { input = "", current = Board.toBoard default, enabled = False, steps = [] }
 
 -- UPDATE
-type Value = Width | Height | Depth | Dummy --| X Int | Y Int | Z Int | Length Int
+type BlockValue = Orientation Orientation | Length
+type Value = Width | Height | Depth | Block Int BlockValue
 type Msg = Tick Time | Solve | Load | Input String | Set Value String
+
+fromJust : Maybe a -> a
+fromJust x = case x of
+    Just y -> y
+    Nothing -> Debug.crash "error: fromJust Nothing"
+realGet i array = fromJust <| Array.get i array
 
 updateBoard : Board -> Value -> String -> Board
 updateBoard board value string =
   let
     conversionResult = String.toInt string
+    blocks = Array.push board.mainBlock board.blocks
+
+    blocksToBoard : Array Block -> Board
+    blocksToBoard blocks =
+      { board | mainBlock = realGet (Array.length blocks - 1) blocks,
+                blocks    = Array.slice 0 -1 blocks }
+
+    set : Block -> BlockValue -> Int -> Block
+    set block blockValue newValue =
+      case blockValue of
+        Orientation X -> { block | x = newValue }
+        Orientation Y -> { block | y = newValue }
+        Orientation Z -> { block | z = newValue }
+        Length        -> { block | length = newValue }
   in
     case conversionResult of
       Ok newValue ->
         case value of
-          Width  -> { board | width  = newValue }
-          Height -> { board | height = newValue }
-          Depth  -> { board | depth  = newValue }
-          Dummy  -> board
+          Width     -> { board | width  = newValue }
+          Height    -> { board | height = newValue }
+          Depth     -> { board | depth  = newValue }
+          Block i v ->
+            let
+              newBlock = set (realGet i blocks) v newValue
+              newBlocks = Array.set i newBlock blocks
+            in
+              blocksToBoard newBlocks
       _ -> board
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -82,7 +108,7 @@ styleSheet = Style.styleSheet [
   ]
 numberInput value num =
   html <| Html.input [
-    type_ "number", Html.Attributes.min "1", Html.Attributes.max "10", Html.Attributes.value (toString num), onInput <| Set value
+    type_ "number", Html.Attributes.min "0", Html.Attributes.max "10", Html.Attributes.value (toString num), onInput <| Set value
       ] []
 spacer = html <| Html.div [style [("width", "50px")]] []
 
@@ -93,15 +119,15 @@ view model =
       [Html.node "style" [] [Html.text cssString], ShowBoard.toHtml model.current]
 
     -- TODO: Rename
-    makeColumn style block = column style [padding 5, spacing 10] [
-      row None [] [text "X: ", numberInput Dummy block.x],
-      row None [] [text "Y: ", numberInput Dummy block.y],
-      row None [] [text "Z: ", numberInput Dummy block.z],
-      row None [] [text "L: ", numberInput Dummy block.length]
+    makeColumn style (i,block) = column style [padding 5, spacing 10] [
+      row None [] [text "X: ", numberInput (Block i <| Orientation X) block.x],
+      row None [] [text "Y: ", numberInput (Block i <| Orientation Y) block.y],
+      row None [] [text "Z: ", numberInput (Block i <| Orientation Z) block.z],
+      row None [] [text "L: ", numberInput (Block i Length)           block.length]
     ]
 
-    makeColumns =
-      (makeColumn Main model.current.mainBlock) :: List.map (makeColumn Other) (Array.toList model.current.blocks)
+    firstColumn = (makeColumn Main (Array.length model.current.blocks, model.current.mainBlock))
+    makeColumns = firstColumn :: List.map (makeColumn Other) (Array.toIndexedList model.current.blocks)
   in
     layout styleSheet <|
       row None [center, width (percent 100), spacing 50] [
