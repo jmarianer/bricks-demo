@@ -1,5 +1,6 @@
 module ShowBoard exposing (toHtml)
 
+import Array
 import Board exposing (Board, Block, Orientation(..))
 import Css exposing (asPairs, deg, px)
 import Html exposing (Html, div)
@@ -68,7 +69,7 @@ toHtml board =
 
     boundingBox = box 0 0 0 board.width board.depth board.height [Rotatable, BoundingBox]
     mainBlock = blockToBox (Tuple.second mungeMainBlock) mainBlockClasses
-    otherBlocks = List.concatMap (\block -> blockToBox block [Rotatable, OtherBlock]) board.blocks
+    otherBlocks = List.concatMap (\block -> blockToBox block [Rotatable, OtherBlock]) <| Array.toList board.blocks
   in
     div [style mainDivStyle] (boundingBox ++ mainBlock ++ otherBlocks ++ windowOut)
   

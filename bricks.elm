@@ -1,3 +1,4 @@
+import Array
 import Board exposing (Board, Orientation(..))
 import Color exposing (rgb)
 import Element exposing (..)
@@ -80,7 +81,7 @@ view model =
     ]
 
     makeColumns =
-      (makeColumn Main model.current.mainBlock) :: List.map (makeColumn Other) model.current.blocks
+      (makeColumn Main model.current.mainBlock) :: List.map (makeColumn Other) (Array.toList model.current.blocks)
   in
     layout styleSheet <|
       row None [center, width (percent 100), spacing 50] [

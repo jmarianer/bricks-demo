@@ -50,7 +50,7 @@ spaces block =
     Set.fromList <| List.map (\x -> withCoord coords block.orientation x) <| List.range start end
 
 allSpaces : Board -> Set Coords
-allSpaces board = List.foldl Set.union (spaces board.mainBlock) (List.map spaces board.blocks)
+allSpaces board = List.foldl Set.union (spaces board.mainBlock) (List.map spaces <| Array.toList board.blocks)
 
 spaceEmpty : Board -> Coords -> Bool
 spaceEmpty board (x, y, z) =
@@ -83,7 +83,7 @@ nextMoves : Board -> List Board
 nextMoves board =
   let
     blocks : Array Block
-    blocks = Array.fromList (board.mainBlock :: board.blocks)
+    blocks = Array.push board.mainBlock board.blocks
 
     tryToMoveBlock : Int -> List (Array Block)
     tryToMoveBlock i =
@@ -92,13 +92,13 @@ nextMoves board =
     tryToMoveAllBlocks : List (Array Block)
     tryToMoveAllBlocks = List.concatMap tryToMoveBlock <| List.range 0 <| Array.length blocks - 1
 
-    blocksToBoard : List Block -> Board
+    blocksToBoard : Array Block -> Board
     blocksToBoard blocks =
-      { board | mainBlock = fromJust <| List.head blocks,
-                blocks    = fromJust <| List.tail blocks }
+      { board | mainBlock = fromJust <| Array.get (Array.length blocks - 1) blocks,
+                blocks    = Array.slice 0 -1 blocks }
 
   in
-    List.map (\blockArray -> blocksToBoard <| Array.toList blockArray) tryToMoveAllBlocks
+    List.map (\blockArray -> blocksToBoard <| blockArray) tryToMoveAllBlocks
 
 winner : Board -> Bool
 winner board =
