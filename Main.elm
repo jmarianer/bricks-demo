@@ -29,7 +29,23 @@ initialModel : Model
 initialModel = { input = "", current = Board.toBoard default, enabled = False, steps = [] }
 
 -- UPDATE
-type Msg = Tick Time | Solve | Load | Input String
+type Value = Width | Height | Depth | Dummy --| X Int | Y Int | Z Int | Length Int
+type Msg = Tick Time | Solve | Load | Input String | Set Value String
+
+updateBoard : Board -> Value -> String -> Board
+updateBoard board value string =
+  let
+    conversionResult = String.toInt string
+  in
+    case conversionResult of
+      Ok newValue ->
+        case value of
+          Width  -> { board | width  = newValue }
+          Height -> { board | height = newValue }
+          Depth  -> { board | depth  = newValue }
+          Dummy  -> board
+      _ -> board
+
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   let
@@ -42,6 +58,7 @@ update msg model =
       Tick _  -> nextStep
       Load    -> { model | current = Board.toBoard model.input, enabled = False }
       Input s -> { model | input = s }
+      Set v s -> { model | current = updateBoard model.current v s }
   in
     (newModel, Cmd.none)
 
@@ -63,7 +80,10 @@ styleSheet = Style.styleSheet [
   Style.style Main  [ Color.background <| rgb 204 0 0 ],
   Style.style Other [ Color.background <| rgb 22 133 204 ]
   ]
-numberInput num = html <| Html.input [type_ "number", Html.Attributes.min "1", Html.Attributes.max "10", Html.Attributes.value (toString num)] []
+numberInput value num =
+  html <| Html.input [
+    type_ "number", Html.Attributes.min "1", Html.Attributes.max "10", Html.Attributes.value (toString num), onInput <| Set value
+      ] []
 spacer = html <| Html.div [style [("width", "50px")]] []
 
 view : Model -> Html Msg
@@ -74,10 +94,10 @@ view model =
 
     -- TODO: Rename
     makeColumn style block = column style [padding 5, spacing 10] [
-      row None [] [text "X: ", numberInput block.x],
-      row None [] [text "Y: ", numberInput block.y],
-      row None [] [text "Z: ", numberInput block.z],
-      row None [] [text "L: ", numberInput block.length]
+      row None [] [text "X: ", numberInput Dummy block.x],
+      row None [] [text "Y: ", numberInput Dummy block.y],
+      row None [] [text "Z: ", numberInput Dummy block.z],
+      row None [] [text "L: ", numberInput Dummy block.length]
     ]
 
     makeColumns =
@@ -88,9 +108,9 @@ view model =
         column None [padding 50, spacing 50] [
           html <| Html.div [secondaryDivStyle] showBoard,
           row None [center] [
-            text "Width: ", numberInput model.current.width, spacer,
-            text "Height: ", numberInput model.current.height, spacer,
-            text "Depth: ", numberInput model.current.depth
+            text "Width: ",  numberInput Width  model.current.width, spacer,
+            text "Height: ", numberInput Height model.current.height, spacer,
+            text "Depth: ",  numberInput Depth  model.current.depth
           ]
         ],
         column None [paddingTop 100, spacing 50] [
