@@ -2,7 +2,7 @@
     "name": "TodoMVC in Elm",
     "repository": "https://github.com/srid/elm-todomvc",
     "env": {
-        "ELM_COMPILE": "elm make bricks.elm"
+        "ELM_COMPILE": "elm make Main.elm"
     },
     "buildpacks": [
         {
