@@ -115,7 +115,7 @@ iterate state =
   let
     newState currentPosition restOfQueue =
       let
-        nextBoards = List.map serializeBoard <| nextMoves <| toBoard currentPosition
+        nextBoards = List.map serializeBoard <| nextMoves <| fromJust <| toBoard currentPosition
         newBoards = Set.diff (Set.fromList nextBoards) state.visited
         newPrevs = List.map (\x -> (x, currentPosition)) <| Set.toList newBoards
 
@@ -129,7 +129,7 @@ iterate state =
     case state.queue of
       [] -> (True, state)
       x::xs ->
-        if (winner <| toBoard x)
+        if (winner <| fromJust <| toBoard x)
         then (True, state)
         else (False, newState x xs)
 
@@ -164,4 +164,4 @@ solveBoard board =
     }
     finalState = iterateUntilDone initialState
   in
-    List.map toBoard <| List.reverse <| extractDefaultPath finalState
+    List.map (fromJust << toBoard) <| List.reverse <| extractDefaultPath finalState

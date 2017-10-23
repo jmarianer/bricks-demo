@@ -23,49 +23,47 @@ type alias Board = {
 }
 
 
--- toBoard converts a string to a Board following a specific format. The
--- function will crash if the string is improperly formatted.
+toInt : String -> Int -> Maybe Int
+toInt s charIndex = String.slice charIndex (charIndex+1) s |> String.toInt |> Result.toMaybe
 
--- Utility functions to help with the crashing
--- TODO: Eliminate Debug.crash here in favor of returning Nothing from toBoard. (We can Debug.crash in SolveBoard.)
-fromJust : Maybe a -> a
-fromJust x = case x of
-    Just y -> y
-    Nothing -> Debug.crash "error: fromJust Nothing"
-
-definitelyInt s = String.toInt s |> Result.toMaybe |> fromJust
-
+toOrientation : String -> Maybe Orientation
 toOrientation s = case s of
-  "X" -> X
-  "Y" -> Y
-  "Z" -> Z
-  _   -> Debug.crash <| "error: toOrientation " ++ s
+  "X" -> Just X
+  "Y" -> Just Y
+  "Z" -> Just Z
+  _   -> Nothing
 
+-- TODO clever name
+cleverName : List (Maybe a) -> Maybe (List a)
+cleverName l = case l of
+  []            -> Just []
+  Nothing :: _  -> Nothing
+  Just l  :: ls ->
+    case cleverName ls of
+      Nothing  -> Nothing
+      Just ls_ -> Just (l :: ls_)
 
+toBlock : String -> Maybe Block
+toBlock s = Maybe.map5 (\l x y z o -> {
+  length =      l,
+  x =           x,
+  y =           y,
+  z =           z,
+  orientation = o
+  }) (toInt s 0) (toInt s 1) (toInt s 2) (toInt s 3) (toOrientation <| String.slice 4 5 s)
 
-toBoard : String -> Board
+toBoard : String -> Maybe Board
 toBoard s =
-  let
-    toBlock : String -> Block
-    toBlock s = {
-      length =      definitelyInt <| String.slice 0 1 s,
-      x =           definitelyInt <| String.slice 1 2 s,
-      y =           definitelyInt <| String.slice 2 3 s,
-      z =           definitelyInt <| String.slice 3 4 s,
-      orientation = toOrientation <| String.slice 4 5 s
-    }
-
-    splits = String.split ";" s
-    boundary = fromJust <| List.head splits
-    blocks = List.map toBlock <| fromJust <| List.tail splits
-  in {
-    width     = definitelyInt <| String.slice 0 1 s,
-    depth     = definitelyInt <| String.slice 1 2 s,
-    height    = definitelyInt <| String.slice 2 3 s,
-    mainBlock = fromJust <| List.head blocks,
-    blocks    = Array.fromList <| fromJust <| List.tail blocks
-  }
-
+  case String.split ";" s of
+    boundary::mainBlock::blocks ->
+      Maybe.map5 (\w d h mb b -> {
+        width     = w,
+        depth     = d,
+        height    = h,
+        mainBlock = mb,
+        blocks    = Array.fromList b
+        }) (toInt boundary 0) (toInt boundary 1) (toInt boundary 2) (toBlock mainBlock) (cleverName <| List.map toBlock blocks)
+    _                           -> Nothing
 
 serializeBoard : Board -> String
 serializeBoard b =

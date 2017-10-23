@@ -26,7 +26,7 @@ type alias Model = {
 
 default = "334;2112Y;2010Y;2200Y;2102Z"
 initialModel : Model
-initialModel = { input = "", current = Board.toBoard default, enabled = False, steps = [] }
+initialModel = { input = "", current = fromJust <| Board.toBoard default, enabled = False, steps = [] }
 
 -- UPDATE
 type BlockValue = Orientation Orientation | Length
@@ -82,7 +82,9 @@ update msg model =
     newModel = case msg of
       Solve   -> { model | steps = SolveBoard.solveBoard model.current, enabled = True }
       Tick _  -> nextStep
-      Load    -> { model | current = Board.toBoard model.input, enabled = False }
+      Load    -> case Board.toBoard model.input of
+        Nothing -> model
+        Just b  -> { model | current = b, enabled = False }
       Input s -> { model | input = s }
       Set v s -> { model | current = updateBoard model.current v s }
   in
