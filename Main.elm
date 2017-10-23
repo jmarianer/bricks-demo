@@ -26,7 +26,7 @@ type alias Model = {
 
 default = "334;2112Y;2010Y;2200Y;2102Z"
 initialModel : Model
-initialModel = { input = "", current = fromJust <| Board.toBoard default, enabled = False, steps = [] }
+initialModel = { input = default, current = fromJust <| Board.toBoard default, enabled = False, steps = [] }
 
 -- UPDATE
 type BlockValue = Orientation Orientation | Length
@@ -146,7 +146,7 @@ view model =
           button None [onClick Solve] (text "Solve"),
           Input.text None [] {
             onChange = Input,
-            value = Board.serializeBoard model.current,
+            value = model.input,
             label = Input.hiddenLabel "",
             options = []
           },
