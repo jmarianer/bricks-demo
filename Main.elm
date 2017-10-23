@@ -13,6 +13,7 @@ import Time exposing (Time, second)
 import ShowBoard
 import SolveBoard
 import Style
+import Style.Border as Border
 import Style.Color as Color
 import Stylesheet exposing (cssString)
 
@@ -31,7 +32,7 @@ initialModel = { input = default, current = fromJust <| Board.toBoard default, e
 -- UPDATE
 type BlockValue = Orientation Orientation | Length
 type Value = Width | Height | Depth | Block Int BlockValue
-type Msg = Tick Time | Solve | Load | Input String | Set Value String
+type Msg = Tick Time | Solve | Load | Save | Input String | Set Value String
 
 fromJust : Maybe a -> a
 fromJust x = case x of
@@ -85,6 +86,7 @@ update msg model =
       Load    -> case Board.toBoard model.input of
         Nothing -> model
         Just b  -> { model | current = b, enabled = False }
+      Save    -> { model | input = Board.serializeBoard model.current }
       Input s -> { model | input = s }
       Set v s -> { model | current = updateBoard model.current v s }
   in
@@ -92,7 +94,7 @@ update msg model =
 
 
 -- VIEW
--- TODO: All these auxiliary functions need to go somewhere and also be documented
+-- TODO More hardcoded styles. BAD.
 secondaryDivStyle = style [
   ("width", " 500px"),
   ("height", " 500px"),
@@ -101,13 +103,21 @@ secondaryDivStyle = style [
   ("align-items", " center"),
   ("overflow", "none")
   ]
-
-type MyStyles = None | Main | Other
-styleSheet = Style.styleSheet [
-  -- TODO: These colors are duplicated from Stylesheet.elm.
-  Style.style Main  [ Color.background <| rgb 204 0 0 ],
-  Style.style Other [ Color.background <| rgb 22 133 204 ]
+textareaStyle = style [
+  ("flex-grow", "1"),
+  ("border-radius", "5px"),
+  ("margin", "2.5px 2.5px 2.5px 1.5px"),
+  ("min-height", "60px"),
+  ("pointer-events", "auto")
   ]
+
+-- TODO: Move to Stylesheet.elm (?)
+type MyStyles = None | Button
+styleSheet = Style.styleSheet [
+  Style.style Button [ Border.all 1, Border.rounded 5, Style.prop "padding" "5px" ]
+  ]
+
+-- TODO: Extract?, document
 numberInput value num =
   html <| Html.input [
     type_ "number", Html.Attributes.min "0", Html.Attributes.max "10", Html.Attributes.value (toString num), onInput <| Set value
@@ -121,15 +131,16 @@ view model =
       [Html.node "style" [] [Html.text cssString], ShowBoard.toHtml model.current]
 
     -- TODO: Rename
-    makeColumn style (i,block) = column style [paddingXY 10 12, spacing 10] [
+    -- TODO: className should be exposed from the style sheet rather than hardcoded at the callsite.
+    makeColumn className (i,block) = column Button [paddingXY 10 12, spacing 10, class className] [
       row None [] [text "X: ", numberInput (Block i <| Orientation X) block.x],
       row None [] [text "Y: ", numberInput (Block i <| Orientation Y) block.y],
       row None [] [text "Z: ", numberInput (Block i <| Orientation Z) block.z],
       row None [] [text "L: ", numberInput (Block i Length)           block.length]
     ]
 
-    firstColumn = (makeColumn Main (Array.length model.current.blocks, model.current.mainBlock))
-    makeColumns = firstColumn :: List.map (makeColumn Other) (Array.toIndexedList model.current.blocks)
+    firstColumn = (makeColumn "MainBlock" (Array.length model.current.blocks, model.current.mainBlock))
+    makeColumns = firstColumn :: List.map (makeColumn "OtherBlock") (Array.toIndexedList model.current.blocks)
   in
     layout styleSheet <|
       row None [center, width (percent 100), spacing 50] [
@@ -141,16 +152,18 @@ view model =
             text "Depth: ",  numberInput Depth  model.current.depth
           ]
         ],
-        column None [paddingTop 100, spacing 50] [
+        column None [paddingTop 100, spacing 5] [
           row None [spacing 10] makeColumns,
-          button None [onClick Solve] (text "Solve"),
-          Input.text None [] {
-            onChange = Input,
-            value = model.input,
-            label = Input.hiddenLabel "",
-            options = []
-          },
-          button None [onClick Load] (text "Load")
+          button Button [onClick Solve] (text "Solve"),
+          Element.spacer 5,
+          el Button [] (text <| Board.serializeBoard model.current),
+          Element.spacer 5,
+          row None [width (percent 100), spacing 5] [
+            html <| Html.textarea [textareaStyle, onInput Input] [],
+            column None [spacing 10] [
+              button Button [onClick Load] (text "Load")
+            ]
+          ]
         ]
       ]
 
