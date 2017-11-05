@@ -15,7 +15,7 @@ main = do
 app index req respond = respond $
     case pathInfo req of
         [x] -> return200 "334;2112Y;2010Y;2200Y;2102Z\n334;2112Y;2010Y;2200Y;2101Z\n334;2112Y;2010Y;2200Y;2100Z\n334;2102Y;2010Y;2200Y;2100Z"
-        _ -> return200html index
+        _   -> return200html index
  
 return200html string = responseBuilder status200 [ ("Content-Type", "text/html") ] $ Data.ByteString.Builder.stringUtf8 string
 return200 string = responseBuilder status200 [ ("Content-Type", "text/plain") ] $ Data.ByteString.Builder.stringUtf8 string

@@ -1,6 +1,6 @@
 elm-stuff
 .*.swp
 index.html
-server
+server/server
 *.hi
 *.o
