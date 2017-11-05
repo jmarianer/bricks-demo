@@ -106,17 +106,14 @@ winner board =
     x b == 0 || y b == 0 || z b == 0
   where b = mainBlock board
 
-foo = [0..]
-
 solveBoard :: Board -> [Board]
 solveBoard board =
   let
+    nubByFirst = nubBy (\(a, _) (c, _) -> a == c)
+
     -- An element in the queue is a board plus the index of its parent position
     queue :: [(Board, Int)]
-
-    -- This implementation will not ignore previously-visited nodes.
-    -- TODO: Figure out an elegant way to make it do that. No cheating and looking it up. :-)
-    queue = (board, -1) : (concatMap nextSteps $ zip [0..] $ map fst queue)
+    queue = nubByFirst $ (board, -1) : (concatMap nextSteps $ zip [0..] $ map fst queue)
 
     nextSteps :: (Int, Board) -> [(Board, Int)]
     nextSteps (parent, board) =

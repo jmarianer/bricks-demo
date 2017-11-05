@@ -81,8 +81,13 @@ update msg model =
       x::xs -> { model | steps = xs, current = x }
 
     newModel = case msg of
-      Solution (Ok s)
-                  -> { model | steps = List.map (fromJust << Board.toBoard) (String.split "\n" s), enabled = True }
+      Solution (Ok s) ->
+        let
+          boards = String.split "\n" s
+        in
+          case boards of
+            _ :: bs -> { model | steps = List.map (fromJust << Board.toBoard) bs, enabled = True }
+            _       -> model
       Tick _      -> nextStep
       Load        -> case Board.toBoard model.input of
         Nothing -> model

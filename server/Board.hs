@@ -4,7 +4,7 @@ import Control.Monad
 import Data.Char
 import Data.List
 
-data Orientation = X | Y | Z deriving Show
+data Orientation = X | Y | Z deriving (Show, Eq)
 
 data Block = Block {
   len :: Int,
@@ -12,7 +12,7 @@ data Block = Block {
   y :: Int,
   z :: Int,
   orientation :: Orientation
-} deriving Show
+} deriving (Show, Eq)
 
 data Board = Board {
   -- TODO: Consider renaming to maxX, maxY, maxZ or a tuple of ints.
@@ -21,7 +21,7 @@ data Board = Board {
   height :: Int,
   mainBlock :: Block,
   blocks :: [Block]
-} deriving Show
+} deriving (Show, Eq)
 
 toInt :: String -> Int -> Maybe Int
 toInt s charIndex =
