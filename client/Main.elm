@@ -8,10 +8,10 @@ import Element.Input as Input
 import Html exposing (Html)
 import Html.Attributes exposing (style, type_)
 import Html.Events exposing (onInput)
+import Http
 import Board exposing (Board, Orientation(..))
 import Time exposing (Time, second)
 import ShowBoard
-import SolveBoard
 import Style
 import Style.Border as Border
 import Style.Color as Color
@@ -32,7 +32,7 @@ initialModel = { input = default, current = fromJust <| Board.toBoard default, e
 -- UPDATE
 type BlockValue = Orientation Orientation | Length
 type Value = Width | Height | Depth | Block Int BlockValue
-type Msg = Tick Time | Solve | Load | Save | Input String | Set Value String
+type Msg = Tick Time | Solve | Solution (Result Http.Error String) | Load | Save | Input String | Set Value String
 
 fromJust : Maybe a -> a
 fromJust x = case x of
@@ -81,16 +81,22 @@ update msg model =
       x::xs -> { model | steps = xs, current = x }
 
     newModel = case msg of
-      Solve   -> { model | steps = SolveBoard.solveBoard model.current, enabled = True }
-      Tick _  -> nextStep
-      Load    -> case Board.toBoard model.input of
+      Solution (Ok s)
+                  -> { model | steps = List.map (fromJust << Board.toBoard) (String.split "\n" s), enabled = True }
+      Tick _      -> nextStep
+      Load        -> case Board.toBoard model.input of
         Nothing -> model
         Just b  -> { model | current = b, enabled = False }
-      Save    -> { model | input = Board.serializeBoard model.current }
-      Input s -> { model | input = s }
-      Set v s -> { model | current = updateBoard model.current v s }
+      Save        -> { model | input = Board.serializeBoard model.current }
+      Input s     -> { model | input = s }
+      Set v s     -> { model | current = updateBoard model.current v s }
+      _           -> model
+
+    command = case msg of
+      Solve -> Http.send Solution (Http.getString <| "/" ++ Board.serializeBoard model.current)
+      _     -> Cmd.none
   in
-    (newModel, Cmd.none)
+    (newModel, command)
 
 
 -- VIEW
