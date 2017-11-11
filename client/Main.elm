@@ -9,6 +9,8 @@ import ShowBoard
 import StyleUtils exposing (..)
 import Time exposing (Time, second)
 
+defaultBlock = { length = 0, x = 0, y = 0, z = 0, orientation = X }
+
 -- MODEL
 type alias Model = {
   input : String,
@@ -24,7 +26,7 @@ initialModel = { input = default, current = fromJust <| Board.toBoard default, e
 -- UPDATE
 type BlockValue = Orientation Orientation | Length
 type Value = Width | Height | Depth | Block Int BlockValue
-type Msg = Tick Time | Solve | Solution (Result Http.Error String) | Load | Save | Input String | Set Value String | Delete Int
+type Msg = Tick Time | Solve | Solution (Result Http.Error String) | Load | Save | Input String | Set Value String | DeleteBlock Int | AddBlock
 
 fromJust : Maybe a -> a
 fromJust x = case x of
@@ -72,6 +74,13 @@ deleteBlock board i =
   in
     { board | blocks = Array.append (Array.slice 0 i blocks) (Array.slice (i+1) (Array.length blocks) blocks) }
 
+addBlock : Board -> Board
+addBlock board =
+  let
+    blocks = board.blocks
+  in
+    { board | blocks = Array.push defaultBlock blocks }
+
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   let
@@ -94,7 +103,8 @@ update msg model =
       Save        -> { model | input = Board.serializeBoard model.current }
       Input s     -> { model | input = s }
       Set v s     -> { model | current = updateBoard model.current v s }
-      Delete i    -> { model | current = deleteBlock model.current i }
+      DeleteBlock i -> { model | current = deleteBlock model.current i }
+      AddBlock    -> { model | current = addBlock model.current }
       _           -> model
 
     command = case msg of
@@ -113,21 +123,26 @@ numberInput label value num =
     ] []
   ]
 
-singleBlockInput : CssClass -> Bool -> (Int, Block) -> Html Msg
-singleBlockInput className allowDelete (i, block) =
-  div [classes [className, SingleBlockInput]] ([
+inputElements i block = [
     numberInput "X" (Block i <| Orientation X) block.x,
     numberInput "Y" (Block i <| Orientation Y) block.y,
     numberInput "Z" (Block i <| Orientation Z) block.z,
     numberInput "L" (Block i Length)           block.length
-  ] ++ if allowDelete then [Html.img [Html.Attributes.src "Trash.svg", Html.Attributes.alt "delete", onClick (Delete i)] []] else [])
+  ]
 
+singleBlockInput : CssClass -> Bool -> (Int, Block) -> Html Msg
+singleBlockInput className allowDelete (i, block) =
+  div [classes [className, SingleBlockInput]] (
+    inputElements i block ++
+    if allowDelete then [Html.img [Html.Attributes.src "Trash.svg", Html.Attributes.alt "delete", onClick (DeleteBlock i)] []] else []
+  )
 
 view : Model -> Html Msg
 view model =
   let
     mainBlockInput = singleBlockInput MainBlock False (Array.length model.current.blocks, model.current.mainBlock)
     otherBlockInputs = List.map (singleBlockInput OtherBlock True) (Array.toIndexedList model.current.blocks)
+    newBlock = div [classes [Disabled, SingleBlockInput], onClick AddBlock] <| inputElements -1 defaultBlock
   in
     div [classes [Main]] [
       div [] [
@@ -139,7 +154,7 @@ view model =
         ]
       ],
       div [classes [RightSideControls]] [
-        div [classes [BlockInputs]] (mainBlockInput :: otherBlockInputs),
+        div [classes [BlockInputs]] (mainBlockInput :: otherBlockInputs ++ [newBlock]),
         Html.button [onClick Solve] [text "Solve"],
         div [classes [CurrentState]] [text <| Board.serializeBoard model.current],
         div [classes [Load]] [

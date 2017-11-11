@@ -20,7 +20,8 @@ type CssClass =
   SingleBlockInput |
   CurrentState |
   Load |
-  RightSideControls
+  RightSideControls |
+  Disabled
 
 style = Css.asPairs >> Html.Attributes.style
 
