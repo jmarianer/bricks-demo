@@ -97,72 +97,6 @@ update msg model =
 
 
 -- VIEW
-{-
--- TODO More hardcoded styles. BAD.
-textareaStyle = style [
-  ("flex-grow", "1"),
-  ("border-radius", "5px"),
-  ("margin", "2.5px 2.5px 2.5px 1.5px"),
-  ("min-height", "60px"),
-  ("pointer-events", "auto")
-  ]
-
--- TODO: Move to Stylesheet.elm (?)
-type MyStyles = None | Button
-styleSheet = Style.styleSheet [
-  Style.style Button [ Border.all 1, Border.rounded 5, Style.prop "padding" "5px" ]
-  ]
-
--- TODO: Extract?, document
-numberInput value num =
-  html <| Html.input [
-    type_ "number", Html.Attributes.min "0", Html.Attributes.max "10", Html.Attributes.value (toString num), onInput <| Set value
-      ] []
-spacer = html <| Html.div [style [("width", "50px")]] []
-
-view : Model -> Html Msg
-view model =
-  let
-    showBoard = [ShowBoard.toHtml model.current]
-
-    -- TODO: Rename
-    -- TODO: className should be exposed from the style sheet rather than hardcoded at the callsite.
-    makeColumn className (i,block) = column Button [paddingXY 10 12, spacing 10, class className] [
-      row None [] [text "X: ", numberInput (Block i <| Orientation X) block.x],
-      row None [] [text "Y: ", numberInput (Block i <| Orientation Y) block.y],
-      row None [] [text "Z: ", numberInput (Block i <| Orientation Z) block.z],
-      row None [] [text "L: ", numberInput (Block i Length)           block.length]
-    ]
-
-    firstColumn = (makeColumn "MainBlock" (Array.length model.current.blocks, model.current.mainBlock))
-    makeColumns = firstColumn :: List.map (makeColumn "OtherBlock") (Array.toIndexedList model.current.blocks)
-  in
-    layout styleSheet <|
-      row None [center, width (percent 100), spacing 50] [
-        column None [padding 50, spacing 50] [
-          html <| Html.div [secondaryDivStyle] showBoard,
-          row None [center] [
-            text "Width: ",  numberInput Width  model.current.width, spacer,
-            text "Height: ", numberInput Height model.current.height, spacer,
-            text "Depth: ",  numberInput Depth  model.current.depth
-          ]
-        ],
-        column None [paddingTop 100, spacing 5] [
-          row None [spacing 10] makeColumns,
-          button Button [onClick Solve] (text "Solve"),
-          Element.spacer 5,
-          el Button [] (text <| Board.serializeBoard model.current),
-          Element.spacer 5,
-          row None [width (percent 100), spacing 5] [
-            html <| Html.textarea [textareaStyle, onInput Input] [],
-            column None [spacing 10] [
-              button Button [onClick Load] (text "Load")
-            ]
-          ]
-        ]
-      ]
--}
-
 numberInput label value num =
   Html.label [] [
     text (label ++ ": "),
@@ -177,7 +111,8 @@ singleBlockInput className (i, block) =
     numberInput "X" (Block i <| Orientation X) block.x,
     numberInput "Y" (Block i <| Orientation Y) block.y,
     numberInput "Z" (Block i <| Orientation Z) block.z,
-    numberInput "L" (Block i Length)           block.length
+    numberInput "L" (Block i Length)           block.length,
+    Html.img [Html.Attributes.src "Trash.svg", Html.Attributes.alt "delete"] []
   ]
 
 
