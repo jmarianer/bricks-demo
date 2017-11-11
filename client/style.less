@@ -16,6 +16,10 @@
   transition: all ease-in-out .3s;
 }
 
+.not-on-mobile {
+  @media only screen and (max-width: 483px) { display: none; }
+}
+
 * {
   box-sizing: border-box;
   transform-style: preserve-3d;
@@ -35,6 +39,10 @@ button {
 
 input[type="number"] {
   width: 3em;
+}
+
+.elm {
+  padding-bottom: 15px;
 }
 
 .Main {
@@ -157,9 +165,11 @@ input[type="number"] {
 
   .CurrentState {
     .round-bordered;
+    .not-on-mobile;
   }
 
   .Load {
+    .not-on-mobile;
     display: flex;
     padding: 0px;
     margin: 0px;
