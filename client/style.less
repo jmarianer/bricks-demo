@@ -64,9 +64,37 @@ body {
 
 .BoardSize {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
 }
 
 .Main {
-  display: grid;
+  display: flex;
+}
+
+.Main > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.BlockInputs {
+  display: flex;
+}
+
+.SingleBlockInput {
+  display: flex;
+  flex-direction: column;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 5px;
+}
+
+.SingleBlockInput label {
+  padding: 5px;
+}
+
+button {
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 5px;
 }

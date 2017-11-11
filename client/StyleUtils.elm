@@ -16,7 +16,9 @@ type CssClass =
   WindowOut |
   Invisible |
   BoundingBox |
-  BackPane
+  BackPane |
+  BlockInputs |
+  SingleBlockInput
 
 style = Css.asPairs >> Html.Attributes.style
 

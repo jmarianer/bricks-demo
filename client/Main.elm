@@ -3,7 +3,7 @@ import Board exposing (Board, Block, Orientation(..))
 import Color exposing (rgb)
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (type_)
-import Html.Events exposing (onInput)
+import Html.Events exposing (onClick, onInput)
 import Http
 import ShowBoard
 import StyleUtils exposing (..)
@@ -171,16 +171,36 @@ numberInput label value num =
     ] []
   ]
 
+singleBlockInput : CssClass -> (Int, Block) -> Html Msg
+singleBlockInput className (i, block) =
+  div [classes [className, SingleBlockInput]] [
+    numberInput "X" (Block i <| Orientation X) block.x,
+    numberInput "Y" (Block i <| Orientation Y) block.y,
+    numberInput "Z" (Block i <| Orientation Z) block.z,
+    numberInput "L" (Block i Length)           block.length
+  ]
+
+
 view : Model -> Html Msg
 view model =
-  div [classes [Main]] [
-    div [classes [BlocksContainer]] [ShowBoard.toHtml model.current],
-    div [classes [BoardSize]] [
-      numberInput "Width"  Width  model.current.width,
-      numberInput "Height" Height model.current.height,
-      numberInput "Depth"  Depth  model.current.depth
+  let
+    mainBlockInput = singleBlockInput MainBlock (Array.length model.current.blocks, model.current.mainBlock)
+    otherBlockInputs = List.map (singleBlockInput OtherBlock) (Array.toIndexedList model.current.blocks)
+  in
+    div [classes [Main]] [
+      div [] [
+        div [classes [BlocksContainer]] [ShowBoard.toHtml model.current],
+        div [classes [BoardSize]] [
+          numberInput "Width"  Width  model.current.width,
+          numberInput "Height" Height model.current.height,
+          numberInput "Depth"  Depth  model.current.depth
+        ]
+      ],
+      div [] [
+        div [classes [BlockInputs]] (mainBlockInput :: otherBlockInputs),
+        Html.button [onClick Solve] [text "Solve"]
+      ]
     ]
-  ]
 
 
 -- MAIN
