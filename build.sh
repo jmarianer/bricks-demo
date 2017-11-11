@@ -7,6 +7,5 @@ docker build -t bricks:latest .
 
 
 # Build and start:
-#   sh -e build.sh && docker run --name foo -p 80:80 bricks:latest
-# Stop:
-#   docker stop -t0 foo && docker rm foo
+#   sh -e build.sh && docker run -p 80:80 -it bricks:latest
+# Stop with ^C
