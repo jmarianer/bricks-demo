@@ -10,7 +10,6 @@ type CssClass =
   Blocks |
   BoardSize |
   Main |
-  Rotatable |
   MainBlock |
   OtherBlock |
   WindowOut |
