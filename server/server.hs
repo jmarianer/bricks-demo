@@ -26,6 +26,7 @@ app staticFiles req respond = respond $
         ["solve", x] -> return200 $ intercalate "\n" $ map serializeBoard $ solveBoard $ fromJust $ toBoard $ Data.Text.unpack x
 --"334;2112Y;2010Y;2200Y;2102Z\n334;2112Y;2010Y;2200Y;2101Z\n334;2112Y;2010Y;2200Y;2100Z\n334;2102Y;2010Y;2200Y;2100Z"
         [""]         -> return200html $ staticFiles Map.! "index.html"
+        []           -> return200html $ staticFiles Map.! "index.html"
         [x]          -> return200html $ staticFiles Map.! Data.Text.unpack x
  
 return200html string = responseBuilder status200 [ ("Content-Type", "text/html") ] $ Data.ByteString.Builder.stringUtf8 string
