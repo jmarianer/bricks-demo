@@ -5,7 +5,18 @@ import Css
 import Html.Attributes
 import Html.CssHelpers
 
-type CssClass = BlocksContainer | Rotatable | MainBlock | OtherBlock | WindowOut | Invisible | BoundingBox | BackPane
+type CssClass =
+  BlocksContainer |
+  Blocks |
+  BoardSize |
+  Main |
+  Rotatable |
+  MainBlock |
+  OtherBlock |
+  WindowOut |
+  Invisible |
+  BoundingBox |
+  BackPane
 
 style = Css.asPairs >> Html.Attributes.style
 

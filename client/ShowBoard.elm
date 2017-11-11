@@ -39,7 +39,7 @@ toHtml board =
     mainBlock = blockToBox (Tuple.second mungeMainBlock) mainBlockClasses
     otherBlocks = List.concatMap (\block -> blockToBox block [Rotatable, OtherBlock]) <| Array.toList board.blocks
   in
-    div [classes [BlocksContainer], style mainDivStyle] (boundingBox ++ mainBlock ++ otherBlocks ++ windowOut)
+    div [classes [Blocks], style mainDivStyle] (boundingBox ++ mainBlock ++ otherBlocks ++ windowOut)
   
 blockToBox : Block -> List CssClass -> List (Html msg)
 blockToBox { length, x, y, z, orientation } =

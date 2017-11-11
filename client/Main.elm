@@ -1,20 +1,13 @@
 import Array exposing (Array)
 import Board exposing (Board, Block, Orientation(..))
 import Color exposing (rgb)
-import Element exposing (..)
-import Element.Attributes exposing (..)
-import Element.Events exposing (onClick)
-import Element.Input as Input
-import Html exposing (Html)
-import Html.Attributes exposing (style, type_)
+import Html exposing (Html, div, text)
+import Html.Attributes exposing (type_)
 import Html.Events exposing (onInput)
 import Http
-import Board exposing (Board, Orientation(..))
-import Time exposing (Time, second)
 import ShowBoard
-import Style
-import Style.Border as Border
-import Style.Color as Color
+import StyleUtils exposing (..)
+import Time exposing (Time, second)
 
 -- MODEL
 type alias Model = {
@@ -104,15 +97,8 @@ update msg model =
 
 
 -- VIEW
+{-
 -- TODO More hardcoded styles. BAD.
-secondaryDivStyle = style [
-  ("width", " 500px"),
-  ("height", " 500px"),
-  ("display", " flex"),
-  ("justify-content", " center"),
-  ("align-items", " center"),
-  ("overflow", "none")
-  ]
 textareaStyle = style [
   ("flex-grow", "1"),
   ("border-radius", "5px"),
@@ -175,6 +161,26 @@ view model =
           ]
         ]
       ]
+-}
+
+numberInput label value num =
+  Html.label [] [
+    text (label ++ ": "),
+    Html.input [
+      type_ "number", Html.Attributes.min "0", Html.Attributes.max "10", Html.Attributes.value (toString num), onInput <| Set value
+    ] []
+  ]
+
+view : Model -> Html Msg
+view model =
+  div [classes [Main]] [
+    div [classes [BlocksContainer]] [ShowBoard.toHtml model.current],
+    div [classes [BoardSize]] [
+      numberInput "Width"  Width  model.current.width,
+      numberInput "Height" Height model.current.height,
+      numberInput "Depth"  Depth  model.current.depth
+    ]
+  ]
 
 
 -- MAIN
