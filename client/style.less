@@ -5,6 +5,11 @@
   border: 1px solid black;
 }
 
+.round-bordered {
+  .bordered;
+  border-radius: 5px;
+}
+
 body {
   background-color: #85B4FF;
   display: flex;
@@ -83,7 +88,7 @@ body {
 .SingleBlockInput {
   display: flex;
   flex-direction: column;
-  border-radius: 5px;
+  .round-bordered;
   padding: 5px;
   margin: 5px;
 }
@@ -93,8 +98,31 @@ body {
 }
 
 button {
+  .round-bordered;
+  font-size: inherit;
+  padding: 5px;
+  margin: 5px;
+}
+
+.CurrentState {
   border: 1px solid black;
   border-radius: 5px;
   padding: 5px;
   margin: 5px;
+}
+
+.Load {
+  display: flex;
+  padding: 5px;
+  margin: 5px;
+
+  textarea {
+    .round-bordered;
+    flex-grow: 1;
+    min-height: 60px;
+  }
+
+  button {
+    align-self: start;
+  }
 }

@@ -196,9 +196,14 @@ view model =
           numberInput "Depth"  Depth  model.current.depth
         ]
       ],
-      div [] [
+      div [classes [RightSideControls]] [
         div [classes [BlockInputs]] (mainBlockInput :: otherBlockInputs),
-        Html.button [onClick Solve] [text "Solve"]
+        Html.button [onClick Solve] [text "Solve"],
+        div [classes [CurrentState]] [text <| Board.serializeBoard model.current],
+        div [classes [Load]] [
+          Html.textarea [onInput Input] [],
+          Html.button [onClick Load] [text "Load"]
+        ]
       ]
     ]
 

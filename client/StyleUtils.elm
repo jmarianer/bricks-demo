@@ -18,7 +18,10 @@ type CssClass =
   BoundingBox |
   BackPane |
   BlockInputs |
-  SingleBlockInput
+  SingleBlockInput |
+  CurrentState |
+  Load |
+  RightSideControls
 
 style = Css.asPairs >> Html.Attributes.style
 
