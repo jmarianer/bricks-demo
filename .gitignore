@@ -1,6 +1,7 @@
 elm-stuff
 .*.swp
-index.html
+bricks.js
+style.css
 server/server
 *.hi
 *.o

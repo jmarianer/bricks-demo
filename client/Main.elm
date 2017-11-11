@@ -98,7 +98,7 @@ update msg model =
       _           -> model
 
     command = case msg of
-      Solve -> Http.send Solution (Http.getString <| "/" ++ Board.serializeBoard model.current)
+      Solve -> Http.send Solution (Http.getString <| "/solve/" ++ Board.serializeBoard model.current)
       _     -> Cmd.none
   in
     (newModel, command)
