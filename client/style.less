@@ -1,3 +1,51 @@
-a {
-  width: 100%;
+@main-block-color: #CC0000;
+@other-block-color: #1685CC;
+
+.bordered {
+  border: 1px solid black;
+}
+
+body {
+  background-color: #85B4FF;
+}
+
+* {
+  box-sizing: border-box;
+  transform-style: preserve-3d;
+}
+
+.Rotatable {
+  transform-origin: top left;
+  position: absolute;
+  transition: all ease-in-out .3s;
+}
+
+.BoundingBox {
+  .bordered;
+}
+
+.MainBlock {
+  .bordered;
+  background-color: @main-block-color;
+}
+
+.OtherBlock {
+  .bordered;
+  background-color: @other-block-color;
+}
+
+.BackPane {
+  background-color: white;
+}
+
+.WindowOut {
+  border: 2px solid black;
+}
+
+.Invisible {
+  opacity: 0;
+}
+
+.BlocksContainer {
+  transform: translateZ(200px) rotateX(76deg) rotateY(187deg) rotateZ(320deg) translateZ(100px);
 }

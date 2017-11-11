@@ -2,48 +2,16 @@ module ShowBoard exposing (toHtml)
 
 import Array
 import Board exposing (Board, Block, Orientation(..))
-import Css exposing (asPairs, deg, px)
 import Html exposing (Html, div)
-import Html.Attributes
-import Html.CssHelpers
-import Stylesheet exposing (..)
+import StyleUtils exposing (..)
 
--- Styling utilities
-style = Css.asPairs >> Html.Attributes.style
-
-pixelsPerBlock = 50
-toPixels x = px <| toFloat <| pixelsPerBlock * x
-
-width : Int -> Css.Style
-width = Css.width << toPixels
-
-height : Int -> Css.Style
-height = Css.height << toPixels
-
-transform : Orientation -> Int -> Int -> Int -> Css.Style
-transform orientation x y z = 
-  let
-    translate x y z =
-      Css.translate3d (toPixels x) (toPixels y) (toPixels z)
-
-    transformList = case orientation of
-      X -> [Css.rotateX (Css.deg -90), translate x y z]
-      Y -> [Css.rotateY (Css.deg  90), translate x y z]
-      Z -> [translate x y -z]
-  in
-    Css.transforms transformList
-
-classes = .class <| Html.CssHelpers.withNamespace ""
-
-
--- Main
 toHtml : Board -> Html msg
 toHtml board =
   let
     mainDivStyle = [
       width board.width,
-      height board.depth,
-      Css.transforms [Css.translateZ (px 200), Css.rotateX (deg 76), Css.rotateY (deg 187), Css.rotateZ (deg 320), Css.translateZ (toPixels (board.height // 2))]]
+      height board.depth
+    ]
 
     boardMainBlock = board.mainBlock
     winPosition = -boardMainBlock.length
@@ -71,7 +39,7 @@ toHtml board =
     mainBlock = blockToBox (Tuple.second mungeMainBlock) mainBlockClasses
     otherBlocks = List.concatMap (\block -> blockToBox block [Rotatable, OtherBlock]) <| Array.toList board.blocks
   in
-    div [style mainDivStyle] (boundingBox ++ mainBlock ++ otherBlocks ++ windowOut)
+    div [classes [BlocksContainer], style mainDivStyle] (boundingBox ++ mainBlock ++ otherBlocks ++ windowOut)
   
 blockToBox : Block -> List CssClass -> List (Html msg)
 blockToBox { length, x, y, z, orientation } =

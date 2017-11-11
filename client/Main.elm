@@ -15,7 +15,6 @@ import ShowBoard
 import Style
 import Style.Border as Border
 import Style.Color as Color
-import Stylesheet exposing (cssString)
 
 -- MODEL
 type alias Model = {
@@ -138,8 +137,7 @@ spacer = html <| Html.div [style [("width", "50px")]] []
 view : Model -> Html Msg
 view model =
   let
-    showBoard =
-      [Html.node "style" [] [Html.text cssString], ShowBoard.toHtml model.current]
+    showBoard = [ShowBoard.toHtml model.current]
 
     -- TODO: Rename
     -- TODO: className should be exposed from the style sheet rather than hardcoded at the callsite.
