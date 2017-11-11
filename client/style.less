@@ -10,11 +10,10 @@
   border-radius: 5px;
 }
 
-body {
-  background-color: #85B4FF;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.rotatable {
+  transform-origin: top left;
+  position: absolute;
+  transition: all ease-in-out .3s;
 }
 
 * {
@@ -22,40 +21,26 @@ body {
   transform-style: preserve-3d;
 }
 
-.Rotatable {
-  transform-origin: top left;
-  position: absolute;
-  transition: all ease-in-out .3s;
+body {
+  background-color: #85B4FF;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: calibri, helvetica, arial, sans-serif;
 }
 
-.BoundingBox {
-  .bordered;
+button {
+  .round-bordered;
+  font-size: inherit;
 }
 
-.MainBlock {
-  .bordered;
-  background-color: @main-block-color;
-}
+.Main {
+  display: flex;
 
-.OtherBlock {
-  .bordered;
-  background-color: @other-block-color;
-}
-
-.BackPane {
-  background-color: white;
-}
-
-.WindowOut {
-  border: 2px solid black;
-}
-
-.Invisible {
-  opacity: 0;
-}
-
-.Blocks {
-  transform: translateZ(200px) rotateX(76deg) rotateY(187deg) rotateZ(320deg) translateZ(100px);
+  > div {
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 .BlocksContainer {
@@ -65,6 +50,40 @@ body {
   align-items: center;
   justify-content: center;
   overflow: hidden;
+
+  .Blocks {
+    transform: translateZ(200px) rotateX(76deg) rotateY(187deg) rotateZ(320deg) translateZ(100px);
+
+    .BoundingBox {
+      .bordered;
+      .rotatable;
+    }
+
+    .MainBlock {
+      .bordered;
+      .rotatable;
+      background-color: @main-block-color;
+    }
+
+    .OtherBlock {
+      .bordered;
+      .rotatable;
+      background-color: @other-block-color;
+    }
+
+    .BackPane {
+      background-color: white;
+    }
+
+    .WindowOut {
+      border: 2px solid black;
+      .rotatable;
+    }
+
+    .Invisible {
+      opacity: 0;
+    }
+  }
 }
 
 .BoardSize {
@@ -72,57 +91,63 @@ body {
   justify-content: space-around;
 }
 
-.Main {
-  display: flex;
-}
+.RightSideControls {
+  align-self: center;
 
-.Main > div {
-  display: flex;
-  flex-direction: column;
-}
-
-.BlockInputs {
-  display: flex;
-}
-
-.SingleBlockInput {
-  display: flex;
-  flex-direction: column;
-  .round-bordered;
-  padding: 5px;
-  margin: 5px;
-}
-
-.SingleBlockInput label {
-  padding: 5px;
-}
-
-button {
-  .round-bordered;
-  font-size: inherit;
-  padding: 5px;
-  margin: 5px;
-}
-
-.CurrentState {
-  border: 1px solid black;
-  border-radius: 5px;
-  padding: 5px;
-  margin: 5px;
-}
-
-.Load {
-  display: flex;
-  padding: 5px;
-  margin: 5px;
-
-  textarea {
-    .round-bordered;
-    flex-grow: 1;
-    min-height: 60px;
+  > * {
+    padding: 5px;
+    margin: 5px;
   }
 
-  button {
-    align-self: start;
+  .BlockInputs {
+    display: flex;
+    padding: 0px;
+    margin: 0px;
+
+    .SingleBlockInput {
+      display: flex;
+      flex-direction: column;
+      .round-bordered;
+      padding: 5px;
+      margin: 5px;
+
+      label {
+        padding: 5px;
+      }
+    }
+
+    .MainBlock {
+      background-color: @main-block-color;
+    }
+
+    .OtherBlock {
+      background-color: @other-block-color;
+    }
+    
+  }
+
+  .CurrentState {
+    .round-bordered;
+  }
+
+  .Load {
+    display: flex;
+    padding: 0px;
+    margin: 0px;
+
+    > * {
+      padding: 5px;
+      margin: 5px;
+    }
+
+    textarea {
+      .round-bordered;
+      flex-grow: 1;
+      min-height: 60px;
+    }
+
+    button {
+      align-self: start;
+    }
   }
 }

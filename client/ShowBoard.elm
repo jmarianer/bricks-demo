@@ -26,18 +26,18 @@ toHtml board =
       else (False, boardMainBlock)
     winner = Tuple.first mungeMainBlock
     mainBlockClasses = if winner
-      then [Rotatable, MainBlock, Invisible]
-      else [Rotatable, MainBlock]
+      then [MainBlock, Invisible]
+      else [MainBlock]
 
     windowOut_ = case boardMainBlock.orientation of
       X -> pane 1 1 X boardMainBlock.y boardMainBlock.z 0
       Y -> pane 1 1 Y boardMainBlock.z boardMainBlock.x 0
       Z -> pane 1 1 Z boardMainBlock.y boardMainBlock.x 0
-    windowOut = [windowOut_ [Rotatable, WindowOut]]
+    windowOut = [windowOut_ [WindowOut]]
 
-    boundingBox = box 0 0 0 board.width board.depth board.height [Rotatable, BoundingBox]
+    boundingBox = box 0 0 0 board.width board.depth board.height [BoundingBox]
     mainBlock = blockToBox (Tuple.second mungeMainBlock) mainBlockClasses
-    otherBlocks = List.concatMap (\block -> blockToBox block [Rotatable, OtherBlock]) <| Array.toList board.blocks
+    otherBlocks = List.concatMap (\block -> blockToBox block [OtherBlock]) <| Array.toList board.blocks
   in
     div [classes [Blocks], style mainDivStyle] (boundingBox ++ mainBlock ++ otherBlocks ++ windowOut)
   
