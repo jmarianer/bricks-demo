@@ -24,7 +24,7 @@ initialModel = { input = default, current = fromJust <| Board.toBoard default, e
 -- UPDATE
 type BlockValue = Orientation Orientation | Length
 type Value = Width | Height | Depth | Block Int BlockValue
-type Msg = Tick Time | Solve | Solution (Result Http.Error String) | Load | Save | Input String | Set Value String
+type Msg = Tick Time | Solve | Solution (Result Http.Error String) | Load | Save | Input String | Set Value String | Delete Int
 
 fromJust : Maybe a -> a
 fromJust x = case x of
@@ -65,6 +65,13 @@ updateBoard board value string =
               blocksToBoard newBlocks
       _ -> board
 
+deleteBlock : Board -> Int -> Board
+deleteBlock board i =
+  let
+    blocks = board.blocks
+  in
+    { board | blocks = Array.append (Array.slice 0 i blocks) (Array.slice (i+1) (Array.length blocks) blocks) }
+
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   let
@@ -87,6 +94,7 @@ update msg model =
       Save        -> { model | input = Board.serializeBoard model.current }
       Input s     -> { model | input = s }
       Set v s     -> { model | current = updateBoard model.current v s }
+      Delete i    -> { model | current = deleteBlock model.current i }
       _           -> model
 
     command = case msg of
@@ -105,22 +113,21 @@ numberInput label value num =
     ] []
   ]
 
-singleBlockInput : CssClass -> (Int, Block) -> Html Msg
-singleBlockInput className (i, block) =
-  div [classes [className, SingleBlockInput]] [
+singleBlockInput : CssClass -> Bool -> (Int, Block) -> Html Msg
+singleBlockInput className allowDelete (i, block) =
+  div [classes [className, SingleBlockInput]] ([
     numberInput "X" (Block i <| Orientation X) block.x,
     numberInput "Y" (Block i <| Orientation Y) block.y,
     numberInput "Z" (Block i <| Orientation Z) block.z,
-    numberInput "L" (Block i Length)           block.length,
-    Html.img [Html.Attributes.src "Trash.svg", Html.Attributes.alt "delete"] []
-  ]
+    numberInput "L" (Block i Length)           block.length
+  ] ++ if allowDelete then [Html.img [Html.Attributes.src "Trash.svg", Html.Attributes.alt "delete", onClick (Delete i)] []] else [])
 
 
 view : Model -> Html Msg
 view model =
   let
-    mainBlockInput = singleBlockInput MainBlock (Array.length model.current.blocks, model.current.mainBlock)
-    otherBlockInputs = List.map (singleBlockInput OtherBlock) (Array.toIndexedList model.current.blocks)
+    mainBlockInput = singleBlockInput MainBlock False (Array.length model.current.blocks, model.current.mainBlock)
+    otherBlockInputs = List.map (singleBlockInput OtherBlock True) (Array.toIndexedList model.current.blocks)
   in
     div [classes [Main]] [
       div [] [
