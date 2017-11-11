@@ -1,6 +1,5 @@
 FROM haskell:8
 RUN cabal update
-RUN cabal install snap
 RUN cabal install http-types
 RUN cabal install wai
 RUN cabal install warp
