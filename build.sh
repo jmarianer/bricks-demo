@@ -9,3 +9,7 @@ docker build -t joeym/bricks:latest .
 # Build and start:
 #   sh -e build.sh && docker run -p 80:80 -it joeym/bricks:latest
 # Stop with ^C
+
+# Deploy:
+#   docker push joeym/bricks:latest
+#   kubectl set image deployment/hello-web hello-web=joeym/bricks:latest
