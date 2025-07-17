@@ -1,6 +1,6 @@
 FROM haskell:8
 RUN cabal update
-RUN cabal install http-types
-RUN cabal install wai
-RUN cabal install warp
-RUN cabal install utf8-string
+RUN cabal install --lib http-types
+RUN cabal install --lib wai
+RUN cabal install --lib warp
+RUN cabal install --lib utf8-string
